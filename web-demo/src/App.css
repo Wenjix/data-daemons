@@ -69,6 +69,15 @@
               0 2px 8px rgba(114, 75, 217, 0.4);
 }
 
+.spell-controls .spell-btn.purple.active {
+  background: linear-gradient(135deg,
+    rgba(114, 75, 217, 0.6),
+    rgba(217, 75, 138, 0.5));
+  border-color: rgba(111, 244, 255, 0.8);
+  box-shadow: inset 0 0 20px rgba(114, 75, 217, 0.4),
+              0 6px 24px rgba(111, 244, 255, 0.6);
+}
+
 /* Pedestals overlay */
 .pedestals { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
 .pedestal { position: absolute; width: 240px; height: 300px; border-radius: var(--radii-pedestal); background: radial-gradient(180px 120px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick); pointer-events: auto; cursor: pointer;
@@ -611,4 +620,153 @@
 .memphis-design .speech-bubble-arrow {
   border-top-color: var(--color-spectral-cyan);
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 1));
+}
+
+/* ==================================================
+   Agentify Bubble - Activity Suggestions
+   ================================================== */
+
+.agentify-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  margin-bottom: 15px;
+  pointer-events: none;
+  z-index: 100;
+  animation: speech-bubble-fade-in 0.4s ease-out forwards;
+}
+
+.agentify-bubble-content {
+  padding: 12px 18px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 240px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4),
+              0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Daemon-specific colors for agentify bubbles */
+.agentify-bubble.daemon-nova .agentify-bubble-content {
+  background: rgba(255, 59, 59, 0.95);
+  border: 1px solid rgba(255, 59, 59, 0.6);
+}
+
+.agentify-bubble.daemon-pixel .agentify-bubble-content {
+  background: rgba(168, 85, 247, 0.95);
+  border: 1px solid rgba(168, 85, 247, 0.6);
+}
+
+.agentify-bubble.daemon-echo .agentify-bubble-content {
+  background: rgba(20, 184, 166, 0.95);
+  border: 1px solid rgba(20, 184, 166, 0.6);
+}
+
+.agentify-bubble-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+}
+
+/* Daemon-specific arrow colors */
+.agentify-bubble.daemon-nova .agentify-bubble-arrow {
+  border-top: 10px solid rgba(255, 59, 59, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(255, 59, 59, 0.4));
+}
+
+.agentify-bubble.daemon-pixel .agentify-bubble-arrow {
+  border-top: 10px solid rgba(168, 85, 247, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(168, 85, 247, 0.4));
+}
+
+.agentify-bubble.daemon-echo .agentify-bubble-arrow {
+  border-top: 10px solid rgba(20, 184, 166, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(20, 184, 166, 0.4));
+}
+
+/* ==================================================
+   Summoner Bubble - Next to Summoner Portrait
+   ================================================== */
+
+.summoner-bubble {
+  position: absolute;
+  top: 80px;
+  right: calc(50% + 120px);
+  max-width: 260px;
+  pointer-events: auto;
+  z-index: 150;
+  animation: speech-bubble-fade-in 0.4s ease-out forwards;
+}
+
+.summoner-bubble-content {
+  background: rgba(111, 244, 255, 0.95);
+  color: rgba(12, 15, 18, 0.95);
+  padding: 16px 20px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 6px 20px rgba(111, 244, 255, 0.4),
+              0 0 0 1px rgba(111, 244, 255, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(111, 244, 255, 0.7);
+}
+
+.summoner-text {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.summon-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg,
+    rgba(111, 244, 255, 0.9),
+    rgba(6, 84, 94, 0.9));
+  border: 1px solid rgba(6, 84, 94, 0.8);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.98);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(6, 84, 94, 0.5);
+}
+
+.summon-btn:hover {
+  background: linear-gradient(135deg,
+    rgba(6, 84, 94, 1),
+    rgba(111, 244, 255, 1));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(6, 84, 94, 0.7);
+}
+
+.summon-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(6, 84, 94, 0.5);
+}
+
+/* Arrow pointing left toward summoner */
+.summoner-bubble-arrow-left {
+  position: absolute;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-right: 10px solid rgba(111, 244, 255, 0.95);
+  filter: drop-shadow(-2px 0 4px rgba(111, 244, 255, 0.3));
 }

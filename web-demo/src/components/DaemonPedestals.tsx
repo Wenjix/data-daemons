@@ -6,7 +6,16 @@ import { usePetStore } from '../stores/petStore'
 import { DaemonEgg } from './DaemonEgg'
 import { useUIStore } from '../stores/uiStore'
 import { SpeechBubble } from './SpeechBubble'
+import { AgentifyBubble } from './AgentifyBubble'
+import { useMagicStore } from '../stores/magicStore'
 import { useIdleMusingsForDaemon } from '../hooks/useIdleMusings'
+
+// Activity suggestions for each daemon
+const DAEMON_ACTIVITIES: Record<string, string> = {
+  Nova: "I can help you analyze your inbox patterns and surface insights from your communications",
+  Pixel: "Let me craft a visual dashboard to track your creative projects and inspiration sources",
+  Echo: "I'll synthesize your meeting notes into actionable summaries and track follow-ups"
+}
 
 interface DaemonPedestalProps {
   daemon: Doc<'daemons'>
@@ -39,6 +48,7 @@ function DaemonPedestal({
   const idleMusings = usePetStore((s) => s.idleMusings)
   const clearIdleMusing = usePetStore((s) => s.clearIdleMusing)
   const daemonMusing = idleMusings[daemon._id]
+  const agentifyState = useMagicStore((s) => s.agentifyState)
 
   const classes = [
     'pedestal',
@@ -46,6 +56,8 @@ function DaemonPedestal({
     isActive ? 'active' : 'inactive',
     isActive && hasError ? 'errored' : '',
   ].join(' ')
+
+  const activityMessage = DAEMON_ACTIVITIES[daemon.name] || "I can help you with various tasks"
 
   return (
     <div className={classes} key={daemon._id} onClick={() => onSelect(daemon._id as Id<'daemons'>)}>
@@ -89,9 +101,13 @@ function DaemonPedestal({
       {/* Daemon egg display */}
       <DaemonEgg daemon={daemon} badgeContent={isCopied ? 'copied' : undefined} />
 
-      {/* Speech bubble for idle musings */}
-      {daemonMusing && (
-        <SpeechBubble message={daemonMusing.message} onDismiss={() => clearIdleMusing(daemon._id)} />
+      {/* Speech bubbles - conditional based on agentifyState */}
+      {agentifyState ? (
+        <AgentifyBubble message={activityMessage} daemonName={daemon.name} />
+      ) : (
+        daemonMusing && (
+          <SpeechBubble message={daemonMusing.message} onDismiss={() => clearIdleMusing(daemon._id)} />
+        )
       )}
 
       {/* Nameplate */}

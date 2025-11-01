@@ -2,17 +2,25 @@ import { useEffect, useRef } from 'react'
 import * as PIXI from 'pixi.js'
 import { usePetStore } from '../stores/petStore'
 import { useDebugStore } from '../stores/debugStore'
+import { useMagicStore } from '../stores/magicStore'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { SummonerBubble } from '../components/SummonerBubble'
 
 export function Stage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const activeDaemonId = usePetStore((s) => s.activeDaemonId)
   const visualStyle = useDebugStore((s) => s.visualStyle)
+  const agentifyState = useMagicStore((s) => s.agentifyState)
   const daemon = useQuery(api.daemons.get, activeDaemonId ? { id: activeDaemonId } : 'skip')
   const stageCode = daemon?.stage ?? 0
   const satisfaction = daemon?.satisfaction ?? 0
   const stageName = ['Egg', 'Baby', 'Teen', 'Adult'][stageCode] ?? 'Egg'
+
+  const handleSummon = () => {
+    console.log('Summoning daily report web app...')
+    // TODO: Implement actual summon logic
+  }
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -100,6 +108,7 @@ export function Stage() {
   return (
     <div className="pixi-stage" ref={containerRef}>
       <img src="/summoner.png" alt="Summoner" className="summoner-portrait" />
+      {agentifyState && <SummonerBubble onSummon={handleSummon} />}
     </div>
   )
 }

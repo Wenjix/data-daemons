@@ -12,8 +12,10 @@ export function TraitPanel() {
   const daemon = useQuery(api.daemons.get, activeDaemonId ? { id: activeDaemonId } : 'skip')
   const contextState = useMagicStore((s) => s.contextState)
   const memoryState = useMagicStore((s) => s.memoryState)
+  const agentifyState = useMagicStore((s) => s.agentifyState)
   const toggleContext = useMagicStore((s) => s.toggleContext)
   const toggleMemory = useMagicStore((s) => s.toggleMemory)
+  const toggleAgentify = useMagicStore((s) => s.toggleAgentify)
 
   const sorted = useMemo(() => {
     const values = daemon?.traits ?? {}
@@ -61,6 +63,13 @@ export function TraitPanel() {
           title="Toggle Memory State"
         >
           Cast Hyperspell
+        </button>
+        <button
+          className={`spell-btn purple ${agentifyState ? 'active' : ''}`}
+          onClick={toggleAgentify}
+          title="Toggle Agentify Effect"
+        >
+          Cast Agentify
         </button>
       </div>
     </div>
