@@ -3,6 +3,7 @@ import { usePetStore } from '../stores/petStore'
 import type { TraitKey } from '../stores/petStore'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
+import { RoastDisplay } from './RoastDisplay'
 
 export function TraitPanel() {
   const activeDaemonId = usePetStore((s) => s.activeDaemonId)
@@ -29,7 +30,7 @@ export function TraitPanel() {
       </ul>
       <div className="roast">
         <h3>Roast</h3>
-        <p>{roast || 'Feed the pet to get a roast...'}</p>
+        <RoastDisplay roast={roast} fallbackMessage="Feed the pet to get a roast..." />
       </div>
     </div>
   )

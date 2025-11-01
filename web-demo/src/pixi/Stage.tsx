@@ -82,8 +82,8 @@ export function Stage() {
       }
 
       // Then destroy the app
-      // Multiple safety checks: renderer exists and not already destroyed
-      if (app && app.renderer && !app._destroyed) {
+      // Multiple safety checks: renderer exists
+      if (app && app.renderer) {
         try {
           app.destroy(true, {
             children: true,

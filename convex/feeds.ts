@@ -99,6 +99,8 @@ export const complete = mutation({
     }),
     roast: v.string(),
     now: v.number(),
+    newArchetypeId: v.optional(v.string()),
+    topTraits: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const feed = await ctx.db
@@ -137,14 +139,31 @@ export const complete = mutation({
       evolved = true;
     }
 
-    await ctx.db.patch(feed.daemonId, {
+    // Build patch object with archetype data if provided
+    const daemonPatch: any = {
       traits: newTraits,
       feedsSinceEvolution: feedsSince,
       stage,
       lastUpdated: args.now,
-    });
+    };
 
-    return { evolved, stage, feedsSinceEvolution: feedsSince };
+    // Update archetype if provided
+    if (args.newArchetypeId) {
+      daemonPatch.archetypeId = args.newArchetypeId;
+      daemonPatch.lastArchetypeUpdate = args.now;
+    }
+    if (args.topTraits) {
+      daemonPatch.topTraits = args.topTraits;
+    }
+
+    await ctx.db.patch(feed.daemonId, daemonPatch);
+
+    return {
+      evolved,
+      stage,
+      feedsSinceEvolution: feedsSince,
+      archetypeId: args.newArchetypeId,
+    };
   },
 });
 

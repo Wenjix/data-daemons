@@ -82,6 +82,7 @@ export function DropZone() {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const setRoast = usePetStore((s) => s.setRoast)
   const activeDaemonId = usePetStore((s) => s.activeDaemonId)
+  const setLastFeedTime = usePetStore((s) => s.setLastFeedTime)
   const daemon = useQuery(api.daemons.get, activeDaemonId ? { id: activeDaemonId } : 'skip')
   const startProcessing = useMutation(api.feeds.startProcessing)
   const complete = useMutation(api.feeds.complete)
@@ -123,12 +124,20 @@ export function DropZone() {
             attachmentsMeta: null,
             now: Date.now(),
           })
-          const res = await postAnalyze({ text: txt, currentTraits })
+          const res = await postAnalyze({ text: txt, currentTraits, currentArchetypeId: daemon?.archetypeId })
           setRoast(res.roast)
           eventBus.emit('analyzeResult', res)
           const deltaObj: Record<string, number> = {}
           for (const d of res.traitDeltas) deltaObj[d.trait] = d.delta
-          await complete({ feedId, traitsDelta: toTraitsObject(deltaObj), roast: res.roast || '', now: Date.now() })
+          await complete({
+            feedId,
+            traitsDelta: toTraitsObject(deltaObj),
+            roast: res.roast || '',
+            now: Date.now(),
+            newArchetypeId: res.newArchetypeId,
+            topTraits: res.topTraits,
+          })
+          if (activeDaemonId) setLastFeedTime(activeDaemonId, Date.now())
         } catch (err) {
           console.error('Analysis failed:', err)
           const res = { caption: txt.slice(0, 64), tags: ['text', 'mock'], roast: 'Local mock: witty', traitDeltas: [] }
@@ -171,6 +180,7 @@ export function DropZone() {
           const deltaObj: Record<string, number> = {}
           for (const d of res.traitDeltas) deltaObj[d.trait] = d.delta
           await complete({ feedId, traitsDelta: toTraitsObject(deltaObj), roast: res.roast || '', now: Date.now() })
+          if (activeDaemonId) setLastFeedTime(activeDaemonId, Date.now())
         } catch (err) {
           console.error('Analysis failed:', err)
           const res = { caption: 'Image mock', tags: ['image', 'mock'], roast: 'Local mock: nice pic', traitDeltas: [] }
@@ -196,7 +206,7 @@ export function DropZone() {
         return
       }
     }
-  }, [activeDaemonId, currentTraits, setRoast, startProcessing, complete, errored])
+  }, [activeDaemonId, currentTraits, setRoast, startProcessing, complete, errored, daemon, setLastFeedTime])
 
   const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -228,6 +238,7 @@ export function DropZone() {
         const deltaObj: Record<string, number> = {}
         for (const d of res.traitDeltas) deltaObj[d.trait] = d.delta
         await complete({ feedId, traitsDelta: toTraitsObject(deltaObj), roast: res.roast || '', now: Date.now() })
+        if (activeDaemonId) setLastFeedTime(activeDaemonId, Date.now())
       } catch (err) {
         console.error('Analysis failed:', err)
         const res = { caption: txt.slice(0, 64), tags: ['text', 'mock'], roast: 'Local mock: paste', traitDeltas: [] }
@@ -260,6 +271,7 @@ export function DropZone() {
         const deltaObj: Record<string, number> = {}
         for (const d of res.traitDeltas) deltaObj[d.trait] = d.delta
         await complete({ feedId, traitsDelta: toTraitsObject(deltaObj), roast: res.roast || '', now: Date.now() })
+        if (activeDaemonId) setLastFeedTime(activeDaemonId, Date.now())
       } catch (err) {
         console.error('Analysis failed:', err)
         const res = { caption: txt.slice(0, 64), tags: ['text', 'mock'], roast: 'Local mock: typed', traitDeltas: [] }

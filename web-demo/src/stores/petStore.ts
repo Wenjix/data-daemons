@@ -38,6 +38,12 @@ type PetState = {
   personalityTraits: PersonalityTraits
 }
 
+type IdleMusing = {
+  message: string
+  trait: string
+  timestamp: number
+}
+
 type PetStore = PetState & {
   setRoast: (roast: string | undefined) => void
   roast?: string
@@ -45,6 +51,11 @@ type PetStore = PetState & {
   feedCountThreshold: (stage: EvolutionStage) => number
   activeDaemonId?: Id<"daemons">
   setActiveDaemonId: (id: Id<"daemons">) => void
+  idleMusings: Record<string, IdleMusing>
+  setIdleMusing: (daemonId: string, musing: IdleMusing) => void
+  clearIdleMusing: (daemonId: string) => void
+  lastFeedTimes: Record<string, number>
+  setLastFeedTime: (daemonId: string, time: number) => void
 }
 
 const initialValues: Record<TraitKey, number> = {
@@ -78,8 +89,25 @@ export const usePetStore = create<PetStore>((set, get) => ({
   personalityTraits: { values: initialValues, active: [] },
   roast: undefined,
   activeDaemonId: undefined,
+  idleMusings: {},
+  lastFeedTimes: {},
   setActiveDaemonId: (id) => set({ activeDaemonId: id }),
   setRoast: (roast) => set({ roast }),
+  setIdleMusing: (daemonId, musing) => {
+    const musings = { ...get().idleMusings }
+    musings[daemonId] = musing
+    set({ idleMusings: musings })
+  },
+  clearIdleMusing: (daemonId) => {
+    const musings = { ...get().idleMusings }
+    delete musings[daemonId]
+    set({ idleMusings: musings })
+  },
+  setLastFeedTime: (daemonId, time) => {
+    const times = { ...get().lastFeedTimes }
+    times[daemonId] = time
+    set({ lastFeedTimes: times })
+  },
   feedCountThreshold: (stage) => {
     if (stage === 'Egg') return 5
     if (stage === 'Baby') return 8

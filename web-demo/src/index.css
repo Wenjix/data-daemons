@@ -238,20 +238,6 @@ button:focus, button:focus-visible { outline: none; box-shadow: var(--focus-ring
   z-index: 1;
 }
 
-.memphis-design .drop-zone::after,
-.memphis-design .trait-panel::after {
-  content: '';
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  background: var(--color-ember-magenta);
-  border-radius: 50%;
-  border: 3px solid #000000;
-  bottom: -10px;
-  left: -10px;
-  z-index: 1;
-}
-
 /* Memphis squiggly lines */
 .memphis-design .app-header::after {
   content: '';
@@ -295,25 +281,50 @@ button:focus, button:focus-visible { outline: none; box-shadow: var(--focus-ring
 
 /* Memphis pedestal positioning (preserves original transforms + adds rotation) */
 .memphis-design .pedestal.pos-a.inactive {
-  transform: scale(0.6) rotate(0.5deg);
+  transform: scale(1) rotate(0.5deg);
 }
 
 .memphis-design .pedestal.pos-a.active {
-  transform: scale(1.1) rotate(-0.5deg);
+  transform: scale(1) rotate(-0.5deg);
 }
 
 .memphis-design .pedestal.pos-b.inactive {
-  transform: translateX(-50%) scale(0.6) rotate(1deg);
+  transform: translateX(-50%) scale(1) rotate(1deg);
 }
 
 .memphis-design .pedestal.pos-b.active {
-  transform: translateX(-50%) scale(1.1) rotate(-1deg);
+  transform: translateX(-50%) scale(1) rotate(-1deg);
 }
 
 .memphis-design .pedestal.pos-c.inactive {
-  transform: scale(0.6) rotate(-0.5deg);
+  transform: scale(1) rotate(-0.5deg);
 }
 
 .memphis-design .pedestal.pos-c.active {
-  transform: scale(1.1) rotate(0.5deg);
+  transform: scale(1) rotate(0.5deg);
+}
+
+/* Memphis roast bubble overrides for light theme legibility */
+.memphis-design .roast-display {
+  background: var(--color-spectral-cyan);
+  backdrop-filter: none;
+  border: 4px solid #000000;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
+  border-radius: 12px;
+}
+
+.memphis-design .roast-text {
+  color: #000000;
+  text-shadow: none;
+  font-weight: 700;
+}
+
+.memphis-design .cursor {
+  color: #000000;
+}
+
+.memphis-design .roast-bubble-arrow {
+  border-top-color: var(--color-spectral-cyan);
+  border-width: 14px 14px 0;
+  filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 1));
 }

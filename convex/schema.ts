@@ -33,6 +33,9 @@ export default defineSchema({
         satisfaction: v.number(),
         spriteUrl: v.string(),
         lastUpdated: v.number(),
+        archetypeId: v.optional(v.string()),
+        topTraits: v.optional(v.array(v.string())),
+        lastArchetypeUpdate: v.optional(v.number()),
     }),
     feeds: defineTable({
         feedId: v.string(),

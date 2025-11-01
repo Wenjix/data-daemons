@@ -7,6 +7,7 @@ import { DaemonSwitcher } from './components/DaemonSwitcher'
 import { FeedTimeline } from './components/FeedTimeline'
 import { DaemonPedestals } from './components/DaemonPedestals'
 import { DaemonDetail } from './components/DaemonDetail'
+import { DaemonChat } from './components/DaemonChat'
 import { DebugMenu } from './components/DebugMenu'
 import { useUIStore } from './stores/uiStore'
 import { useDebugStore } from './stores/debugStore'
@@ -57,9 +58,7 @@ export default function App() {
       ) : (
         <DaemonDetail />
       )}
-      <footer className="app-footer">
-        <span>MVP • drag text or an image to feed the pet • evolution thresholds: Egg 5, Baby 8, Teen 12</span>
-      </footer>
+      <DaemonChat />
     </div>
   )
 }

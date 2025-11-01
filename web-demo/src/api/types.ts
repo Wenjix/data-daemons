@@ -36,6 +36,7 @@ export type AnalyzeRequest = {
   imageBase64?: string
   currentTraits: PersonalityTraits
   dominantTrait?: TraitKey
+  currentArchetypeId?: string
 }
 
 export type AnalyzeResponse = {
@@ -43,4 +44,6 @@ export type AnalyzeResponse = {
   tags: string[]
   roast?: string
   traitDeltas: TraitDelta[]
+  newArchetypeId?: string
+  topTraits?: string[]
 }

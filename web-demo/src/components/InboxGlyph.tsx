@@ -8,7 +8,7 @@ type Props = {
 
 function makeEmailAddress(daemonName: string) {
   const local = daemonName.trim().toLowerCase().replace(/\s+/g, '-')
-  return `daemon-${local}@agentmail.local` // placeholder domain for demo
+  return `${local}-pet@agentmail.to`
 }
 
 export function InboxGlyph({ daemon, badgeContent }: Props) {

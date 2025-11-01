@@ -26,29 +26,36 @@
 .summoner-portrait { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; border-radius: 50%; object-fit: cover; pointer-events: none; z-index: 1; }
 
 /* Pedestals overlay */
-.pedestals { position: absolute; inset: 0; pointer-events: none; }
-.pedestal { position: absolute; width: 140px; height: 140px; border-radius: var(--radii-pedestal); background: radial-gradient(120px 80px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick);
+.pedestals { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+.pedestal { position: absolute; width: 240px; height: 300px; border-radius: var(--radii-pedestal); background: radial-gradient(180px 120px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick);
 }
-.pedestal.inactive { transform: scale(0.6); }
-.pedestal.active { transform: scale(1.1); outline: 1px solid rgba(111,244,255,0.35); }
+.pedestal.inactive { transform: scale(1); }
+.pedestal.active { transform: scale(1); outline: 1px solid rgba(111,244,255,0.35); }
 .pedestal.errored { outline: 2px solid rgba(200,40,60,0.6); }
-.pedestal .name { font-size: 12px; color: #c5cedd; }
+
+/* Action buttons - hidden by default, reveal on hover */
+.pedestal .action-buttons { display: flex; gap: 8px; opacity: 0; transition: opacity 0.2s ease; pointer-events: auto; }
+.pedestal:hover .action-buttons { opacity: 1; }
+.pedestal .action-btn { width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(111,244,255,0.3); background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; font-size: 16px; }
+.pedestal .action-btn:hover { background: rgba(111,244,255,0.15); border-color: rgba(111,244,255,0.5); transform: scale(1.1); }
+.pedestal .action-btn:active { transform: scale(0.95); }
+
+/* Nameplate integrated into pedestal base */
+.pedestal .nameplate { width: 140px; padding: 6px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; font-size: 13px; font-weight: 600; color: #c5cedd; text-align: center; letter-spacing: 0.3px; }
 
 /* Organized horizontal row at bottom */
 .pedestal.pos-a { left: 15%; bottom: 80px; }
-.pedestal.pos-b { left: 50%; bottom: 80px; transform: translateX(-50%) scale(0.6); }
+.pedestal.pos-b { left: 50%; bottom: 80px; transform: translateX(-50%) scale(1); }
 .pedestal.pos-c { right: 15%; bottom: 80px; }
 
 /* Special handling for center position active/inactive states */
-.pedestal.pos-b.inactive { transform: translateX(-50%) scale(0.6); }
-.pedestal.pos-b.active { transform: translateX(-50%) scale(1.1); outline: 1px solid rgba(111,244,255,0.35); }
+.pedestal.pos-b.inactive { transform: translateX(-50%) scale(1); }
+.pedestal.pos-b.active { transform: translateX(-50%) scale(1); outline: 1px solid rgba(111,244,255,0.35); }
 
-/* Inbox egg glyph */
-.inbox-egg { pointer-events: auto; width: 64px; height: 84px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%; position: relative; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(111,244,255,0.35); box-shadow: inset 0 0 12px rgba(111,244,255,0.16); cursor: pointer; }
-.inbox-egg:hover { box-shadow: inset 0 0 18px rgba(111,244,255,0.26); }
-.inbox-egg .daemon-portrait { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
-.inbox-egg .badge { position: absolute; top: -6px; right: -6px; background: var(--color-ember-magenta); color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; }
-.inbox-egg .tooltip { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(111,244,255,0.3); padding: 4px 8px; border-radius: 8px; font-size: 11px; white-space: nowrap; }
+/* Daemon egg - display only (non-interactive) */
+.daemon-egg { pointer-events: none; width: 128px; height: 168px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%; position: relative; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(111,244,255,0.35); box-shadow: inset 0 0 20px rgba(111,244,255,0.16); }
+.daemon-egg .daemon-portrait { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; }
+.daemon-egg .badge { position: absolute; top: -8px; right: -8px; background: var(--color-ember-magenta); color: white; border-radius: 12px; padding: 3px 8px; font-size: 11px; font-weight: 600; }
 
 /* Feed timeline cards */
 .feed-timeline { display: flex; flex-direction: column; gap: 10px; }
@@ -69,6 +76,66 @@
 .trait-panel .trait-name { font-weight: 600; }
 .trait-panel .trait-val { font-weight: 600; color: var(--color-gold); }
 .trait-panel .roast { margin-top: 12px; }
+
+/* Roast Display - Speech Bubble with Streaming Text */
+.roast-display {
+  position: relative;
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(217, 75, 138, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(217, 75, 138, 0.6);
+  box-shadow: 0 4px 16px rgba(217, 75, 138, 0.4),
+              0 0 0 1px rgba(217, 75, 138, 0.5);
+  transition: all 0.3s ease;
+}
+
+.roast-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.cursor {
+  display: inline-block;
+  margin-left: 2px;
+  animation: cursor-blink 0.8s infinite;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@keyframes cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Speech Bubble Arrow */
+.roast-bubble-arrow {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid rgba(217, 75, 138, 0.85);
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+}
 
 /* Daemon Detail view */
 .detail-root { display: flex; flex-direction: column; width: 100%; height: calc(100vh - 40px); }
@@ -340,4 +407,90 @@
 
 .memphis-design .debug-style-option:has(input:checked) .debug-style-desc {
   color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================================================
+   Speech Bubble for Idle Musings
+   ================================================== */
+
+.speech-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  margin-bottom: 15px;
+  pointer-events: none;
+  z-index: 100;
+  animation: speech-bubble-fade-in 0.4s ease-out forwards;
+}
+
+.speech-bubble.fade-out {
+  animation: speech-bubble-fade-out 0.5s ease-in forwards;
+}
+
+.speech-bubble-content {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1f2e;
+  padding: 10px 16px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+  max-width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+              0 0 0 1px rgba(111, 244, 255, 0.3);
+  backdrop-filter: blur(8px);
+  font-weight: 500;
+}
+
+.speech-bubble-arrow {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Fade-in animation: slide up and fade in */
+@keyframes speech-bubble-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+/* Fade-out animation: fade out gently */
+@keyframes speech-bubble-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+/* Memphis design mode adjustments */
+.memphis-design .speech-bubble-content {
+  background: var(--color-spectral-cyan);
+  color: #000000;
+  border: 3px solid #000000;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 1),
+              0 0 0 1px #000000;
+  font-weight: 700;
+  border-radius: 8px;
+}
+
+.memphis-design .speech-bubble-arrow {
+  border-top-color: var(--color-spectral-cyan);
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 1));
 }

@@ -61,6 +61,9 @@ export type DaemonRecord = {
   satisfaction: number
   spriteUrl: string
   lastUpdated: number
+  archetypeId?: string
+  topTraits?: string[]
+  lastArchetypeUpdate?: number
 }
 
 export type FeedStatus = 'processing' | 'completed' | 'errored'
@@ -101,6 +104,7 @@ export type AnalyzeRequest = {
   imageBase64?: string
   currentTraits: PersonalityTraits
   dominantTrait?: TraitKey
+  currentArchetypeId?: string
 }
 
 export type AnalyzeResponse = {
@@ -108,6 +112,8 @@ export type AnalyzeResponse = {
   tags: string[]
   roast?: string
   traitDeltas: TraitDelta[]
+  newArchetypeId?: string
+  topTraits?: string[]
 }
 
 export type PetState = {

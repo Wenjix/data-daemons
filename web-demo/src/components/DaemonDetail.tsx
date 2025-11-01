@@ -8,7 +8,7 @@ import { postAnalyze } from '../api/client'
 
 function makeEmailAddress(daemonName: string) {
   const local = daemonName.trim().toLowerCase().replace(/\s+/g, '-')
-  return `daemon-${local}@agentmail.local`
+  return `${local}-pet@agentmail.to`
 }
 
 function HoloDiagram({ daemon }: { daemon: Doc<'daemons'> }) {
@@ -205,6 +205,26 @@ function InboxPanel({ daemon }: { daemon: Doc<'daemons'> }) {
   )
 }
 
+// Archetype display helpers
+const ARCHETYPE_DATA: Record<string, { name: string; emoji: string }> = {
+  guardian: { name: 'Guardian', emoji: '🛡️' },
+  trickster: { name: 'Trickster', emoji: '🃏' },
+  sage: { name: 'Sage', emoji: '📚' },
+  oracle: { name: 'Oracle', emoji: '🔮' },
+  rebel: { name: 'Rebel', emoji: '⚡' },
+  diplomat: { name: 'Diplomat', emoji: '🕊️' },
+  seeker: { name: 'Seeker', emoji: '🔍' },
+  jester: { name: 'Jester', emoji: '🎭' },
+}
+
+function getArchetypeName(archetypeId: string): string {
+  return ARCHETYPE_DATA[archetypeId]?.name || 'Unknown'
+}
+
+function getArchetypeEmoji(archetypeId: string): string {
+  return ARCHETYPE_DATA[archetypeId]?.emoji || '✨'
+}
+
 function TabStrip({ daemon }: { daemon: Doc<'daemons'> }) {
   const [tab, setTab] = useState<'lore' | 'abilities' | 'equipment'>('lore')
   const roast = usePetStore((s) => s.roast)
@@ -222,6 +242,18 @@ function TabStrip({ daemon }: { daemon: Doc<'daemons'> }) {
       <div className="tab-content">
         {tab === 'lore' && (
           <div>
+            {daemon.archetypeId && (
+              <div style={{ marginBottom: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  {getArchetypeEmoji(daemon.archetypeId)} {getArchetypeName(daemon.archetypeId)} Archetype
+                </div>
+                {daemon.topTraits && daemon.topTraits.length > 0 && (
+                  <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                    Currently feeling: {daemon.topTraits.join(', ')}
+                  </div>
+                )}
+              </div>
+            )}
             <p>{roast || 'Feed the daemon to reveal narrative and personality insights.'}</p>
           </div>
         )}
