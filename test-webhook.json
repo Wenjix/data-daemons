@@ -1,0 +1,6 @@
+{
+  "to": ["test-pet@agentmail.to"],
+  "subject": "Test Feed: Basic Message",
+  "text": "This is a basic test message to verify the webhook is working correctly with snake_case fields.",
+  "message_id": "test-basic-001"
+}

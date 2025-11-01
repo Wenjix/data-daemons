@@ -1,0 +1,14 @@
+{
+  "to": ["test-pet@agentmail.to"],
+  "subject": "Test Feed: With Image Attachment",
+  "text": "This test includes an image attachment to verify the attachment whitelist filter works correctly.",
+  "message_id": "test-with-image-001",
+  "attachments": [
+    {
+      "filename": "test-image.png",
+      "content_type": "image/png",
+      "size": 2048,
+      "url": "https://example.com/test-image.png"
+    }
+  ]
+}
