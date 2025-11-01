@@ -1,4 +1,5 @@
 import './App.css'
+import { useEffect } from 'react'
 import { Stage } from './pixi/Stage'
 import { TraitPanel } from './components/TraitPanel'
 import { DropZone } from './components/DropZone'
@@ -6,12 +7,32 @@ import { DaemonSwitcher } from './components/DaemonSwitcher'
 import { FeedTimeline } from './components/FeedTimeline'
 import { DaemonPedestals } from './components/DaemonPedestals'
 import { DaemonDetail } from './components/DaemonDetail'
+import { DebugMenu } from './components/DebugMenu'
 import { useUIStore } from './stores/uiStore'
+import { useDebugStore } from './stores/debugStore'
 
 export default function App() {
   const detailOpen = useUIStore((s) => s.detailOpen)
+  const visualStyle = useDebugStore((s) => s.visualStyle)
+
+  const rootClassName = visualStyle === 'memphis' ? 'app-root memphis-design' : 'app-root'
+
+  // Apply Memphis Design to body element for full-viewport background
+  useEffect(() => {
+    if (visualStyle === 'memphis') {
+      document.body.classList.add('memphis-design')
+    } else {
+      document.body.classList.remove('memphis-design')
+    }
+
+    return () => {
+      document.body.classList.remove('memphis-design')
+    }
+  }, [visualStyle])
+
   return (
-    <div className="app-root">
+    <div className={rootClassName}>
+      <DebugMenu />
       {!detailOpen ? (
         <>
           <header className="app-header">

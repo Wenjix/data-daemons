@@ -12,7 +12,7 @@
   --color-gold: #f2c572; /* pearlescent gold */
   --gradient-ember-to-cyan: linear-gradient(90deg, #d94b8a, #6ff4ff);
 
-  --radii-pedestal: 32px;
+  --radii-pedestal: 50%; /* Circular pedestals */
   --radii-panel: 16px;
   --space-1: 4px;
   --space-2: 8px;
@@ -46,6 +46,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scroll from fixed elements */
 }
 
 h1, h2, h3 {
@@ -75,4 +76,244 @@ button:focus, button:focus-visible { outline: none; box-shadow: var(--focus-ring
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ============================================
+   Memphis Design Theme
+   ============================================ */
+.memphis-design {
+  /* Memphis Color Palette: Bright, bold primaries */
+  --color-bg: #ffffff;
+  --color-void-teal: #00d4ff; /* electric blue */
+  --color-ember-magenta: #ff006e; /* hot pink */
+  --color-spectral-cyan: #ffbe0b; /* bright yellow */
+  --color-gold: #fb5607; /* orange */
+  --color-memphis-green: #8ac926; /* lime green */
+  --color-memphis-purple: #7209b7; /* vibrant purple */
+  --gradient-ember-to-cyan: linear-gradient(135deg, #ff006e, #00d4ff, #ffbe0b);
+
+  /* Memphis Typography: Bold and geometric */
+  font-weight: 600;
+
+  /* Memphis Shapes: Circular pedestals, sharp panels */
+  --radii-pedestal: 50%;
+  --radii-panel: 4px;
+
+  /* Memphis Spacing: More compact, energetic */
+  --space-1: 6px;
+  --space-2: 12px;
+  --space-3: 18px;
+  --space-4: 30px;
+  --space-5: 48px;
+
+  /* Memphis Shadows: Bold, colorful, offset */
+  --shadow-altar: 8px 8px 0 rgba(255, 0, 110, 0.3), 16px 16px 0 rgba(0, 212, 255, 0.2);
+  --focus-ring-cyan: 0 0 0 3px var(--color-spectral-cyan), 0 0 0 6px #000;
+
+  /* Memphis Transitions: Snappier, more energetic */
+  --duration-quick: 100ms;
+  --duration-summon: 400ms;
+  --easing-summon: cubic-bezier(.68,-0.55,.265,1.55); /* bounce */
+
+  /* Color scheme and text */
+  color-scheme: light;
+  color: #000000;
+  background-color: var(--color-bg);
+
+  /* Add Memphis geometric pattern to background */
+  background-image:
+    /* Dots pattern */
+    radial-gradient(circle at 20% 30%, #ff006e 2px, transparent 2px),
+    radial-gradient(circle at 80% 70%, #00d4ff 2px, transparent 2px),
+    radial-gradient(circle at 50% 90%, #ffbe0b 2px, transparent 2px),
+    radial-gradient(circle at 10% 80%, #8ac926 2px, transparent 2px),
+    /* Squiggly lines using repeating gradients */
+    repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(255,0,110,0.1) 100px, rgba(255,0,110,0.1) 102px);
+  background-size: 200px 200px, 150px 150px, 180px 180px, 220px 220px, 100% 100%;
+  background-position: 0 0, 50px 50px, 100px 0, 0 100px, 0 0;
+}
+
+.memphis-design a {
+  color: var(--color-ember-magenta);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--color-spectral-cyan);
+}
+
+.memphis-design a:hover {
+  color: var(--color-memphis-purple);
+  text-decoration-color: var(--color-ember-magenta);
+}
+
+.memphis-design body {
+  background: transparent;
+}
+
+.memphis-design h1,
+.memphis-design h2,
+.memphis-design h3 {
+  font-family: 'Orbitron', 'Impact', 'Arial Black', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* Memphis asymmetry: slight rotation */
+  transform: rotate(-1deg);
+  text-shadow: 3px 3px 0 var(--color-spectral-cyan),
+               6px 6px 0 var(--color-ember-magenta);
+}
+
+.memphis-design button {
+  border-radius: 0; /* Sharp corners */
+  border: 4px solid #000000;
+  padding: 12px 24px;
+  background: var(--color-spectral-cyan);
+  color: #000000;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
+  transition: transform var(--duration-quick), box-shadow var(--duration-quick);
+  position: relative;
+}
+
+.memphis-design button:hover {
+  background: var(--color-ember-magenta);
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 1);
+}
+
+.memphis-design button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+}
+
+.memphis-design button:focus,
+.memphis-design button:focus-visible {
+  outline: 4px dashed var(--color-memphis-purple);
+  outline-offset: 4px;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 1);
+}
+
+/* Memphis geometric decorations on panels and cards */
+.memphis-design .drop-zone,
+.memphis-design .trait-panel,
+.memphis-design .feed-card {
+  border: 4px solid #000000;
+  border-radius: 0;
+  box-shadow: 8px 8px 0 rgba(255, 0, 110, 0.5);
+  background: #ffffff;
+  position: relative;
+  /* Slight asymmetric rotation */
+  transform: rotate(0.5deg);
+}
+
+/* Pedestals styling without transform (to preserve positioning transforms) */
+.memphis-design .pedestal {
+  border: 4px solid #000000;
+  border-radius: 50%; /* Circular eggs */
+  box-shadow: 8px 8px 0 rgba(255, 0, 110, 0.5);
+  background: #ffffff;
+  /* position: absolute is inherited from App.css - don't override it */
+}
+
+.memphis-design .drop-zone:hover,
+.memphis-design .feed-card:hover {
+  transform: rotate(-0.5deg) scale(1.02);
+  box-shadow: 12px 12px 0 rgba(0, 212, 255, 0.5);
+}
+
+/* Add geometric shapes as pseudo-elements */
+.memphis-design .drop-zone::before,
+.memphis-design .trait-panel::before {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: var(--color-spectral-cyan);
+  border: 3px solid #000000;
+  top: -15px;
+  right: -15px;
+  transform: rotate(45deg);
+  z-index: 1;
+}
+
+.memphis-design .drop-zone::after,
+.memphis-design .trait-panel::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: var(--color-ember-magenta);
+  border-radius: 50%;
+  border: 3px solid #000000;
+  bottom: -10px;
+  left: -10px;
+  z-index: 1;
+}
+
+/* Memphis squiggly lines */
+.memphis-design .app-header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--color-ember-magenta) 0px,
+      var(--color-ember-magenta) 20px,
+      var(--color-spectral-cyan) 20px,
+      var(--color-spectral-cyan) 40px,
+      var(--color-memphis-green) 40px,
+      var(--color-memphis-green) 60px,
+      var(--color-memphis-purple) 60px,
+      var(--color-memphis-purple) 80px
+    );
+}
+
+/* Memphis treatment for PixiJS stage */
+.memphis-design .pixi-stage {
+  border: 6px solid #000000;
+  border-radius: 0;
+  box-shadow: 12px 12px 0 rgba(255, 190, 11, 0.5);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+}
+
+/* Memphis inbox glyphs and badges */
+.memphis-design .inbox-glyph {
+  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.8));
+}
+
+.memphis-design .feed-badge {
+  border: 3px solid #000000;
+  border-radius: 0;
+  font-weight: 900;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 1);
+}
+
+/* Memphis pedestal positioning (preserves original transforms + adds rotation) */
+.memphis-design .pedestal.pos-a.inactive {
+  transform: scale(0.6) rotate(0.5deg);
+}
+
+.memphis-design .pedestal.pos-a.active {
+  transform: scale(1.1) rotate(-0.5deg);
+}
+
+.memphis-design .pedestal.pos-b.inactive {
+  transform: translateX(-50%) scale(0.6) rotate(1deg);
+}
+
+.memphis-design .pedestal.pos-b.active {
+  transform: translateX(-50%) scale(1.1) rotate(-1deg);
+}
+
+.memphis-design .pedestal.pos-c.inactive {
+  transform: scale(0.6) rotate(-0.5deg);
+}
+
+.memphis-design .pedestal.pos-c.active {
+  transform: scale(1.1) rotate(0.5deg);
 }

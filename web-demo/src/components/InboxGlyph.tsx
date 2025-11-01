@@ -43,7 +43,11 @@ export function InboxGlyph({ daemon, badgeContent }: Props) {
       onClick={onCopy}
       ref={btnRef}
     >
-      <div className="rune" />
+      <img
+        src={`/daemon-${daemon.name.toLowerCase()}.png`}
+        alt={daemon.name}
+        className="daemon-portrait"
+      />
       {/* Badge shows unread or recent count when provided; also show transient copied state */}
       {copied ? (
         <div className="badge">copied</div>

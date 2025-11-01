@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react'
 import * as PIXI from 'pixi.js'
 import { usePetStore } from '../stores/petStore'
+import { useDebugStore } from '../stores/debugStore'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 export function Stage() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const activeDaemonId = usePetStore((s) => s.activeDaemonId)
+  const visualStyle = useDebugStore((s) => s.visualStyle)
   const daemon = useQuery(api.daemons.get, activeDaemonId ? { id: activeDaemonId } : 'skip')
   const stageCode = daemon?.stage ?? 0
   const satisfaction = daemon?.satisfaction ?? 0
@@ -34,7 +36,7 @@ export function Stage() {
         await app.init({
           width,
           height,
-          background: '#0c0f12',
+          background: visualStyle === 'memphis' ? '#ffffff' : '#0c0f12',
           autoStart: true,
           sharedTicker: false,
           preference: 'webgl', // Use WebGL to avoid WebGPU bugs in React
@@ -60,17 +62,8 @@ export function Stage() {
           app.ticker.maxFPS = 60
         }
 
-        // Main daemon visualization - positioned at top-center
-        const centerX = width / 2
-        const graphics = new PIXI.Graphics()
-        graphics.circle(centerX, 120, 100)  // Larger circle at top-center
-        graphics.fill(0xffffcc)
-        app.stage.addChild(graphics)
-
-        // Offload heavy effects to shader cache placeholder: pre-create a simple filter
-        // In future, heavier effects should be preloaded and reused.
-        const blurFilter = new PIXI.BlurFilter({ strength: 0 })
-        graphics.filters = [blurFilter]
+        // Note: Summoner portrait is rendered as HTML overlay (see JSX return)
+        // This avoids Pixi asset loading conflicts with React StrictMode
       } catch (err) {
         console.error('Failed to initialize Pixi stage:', err)
         mounted = false
@@ -102,7 +95,11 @@ export function Stage() {
         }
       }
     }
-  }, [stageCode, satisfaction, stageName])
+  }, [stageCode, satisfaction, stageName, visualStyle])
 
-  return <div className="pixi-stage" ref={containerRef} />
+  return (
+    <div className="pixi-stage" ref={containerRef}>
+      <img src="/summoner.png" alt="Summoner" className="summoner-portrait" />
+    </div>
+  )
 }
