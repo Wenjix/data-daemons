@@ -1,0 +1,36 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #1b1e24;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: #9aa3b2; text-decoration: none; }
+a:hover { color: #c5cedd; }
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button { border-radius: 6px; border: 1px solid #3b4252; padding: 6px 10px; background: #202431; color: #e5e9f0; }
+button:hover { border-color: #7b88a1; }
+button:focus, button:focus-visible { outline: 2px solid #7b88a1; }
+
+/* Remove light theme overrides to keep consistent dark theme */

@@ -1,6 +1,6 @@
   # Data Daemons – Product Requirements Document (PRD)                                                                                         
                                                                                                                                                
-  Version: 2.2 (Multi-pet, Summoner Architecture)                                                                                              
+  Version: 2.3 (Multi-pet, Summoner Architecture)                                                                                              
   Stack: React + PixiJS + Convex frontend; Python FastAPI backend; Gemini, AgentMail, Hyperspell                                               
   Audience: Product, Engineering, QA                                                                                                           
   Last Updated: 2025-11-01                                                                                                                     
@@ -15,7 +15,7 @@
   Implement this pattern with React event emitters, Convex mutations, and subscription callbacks so every ingestion triggers the same deterministic chain of UI, animation, and persistence updates.                                                                                                                  
                                                                                                                                                               
   Goals:                                                                                                                                                      
-  - Preserve the Unity event-driven loop across ingestion, analysis, trait deltas, evolution, and animations.                                                 
+  - Use event-driven loop across ingestion, analysis, trait deltas, evolution, and animations.                                                 
   - Provide high-fidelity PixiJS animations for each Daemon with seamless switching.                                                                          
   - Integrate Gemini for analysis, speech/roasts, evolution guidance, and name generation.                                                                    
   - Implement multi-Daemon architecture (three concurrent Daemons) with a dedicated switcher.                                                                 
@@ -34,15 +34,14 @@
   - Convex integration for Daemon records, feed history, brainstorm logs, and real-time subscriptions.                                                        
   - Hyperspell integration for contextual memory storage/retrieval.                                                                                           
   - Pet Manager UI and backend orchestration endpoint.                                                                                                        
-  - Optional background removal, name generation, and Dev Mode diagnostics.                                                                                   
-  - Observability across frontend, backend, and third-party services.                                                                                         
+  - Optional background removal, name generation, and Dev Mode diagnostics.                                                                                                                                                                          
                                                                                                                                                         
                                                                                                                                                               
   ## 3. Canonical Traits & Stage Mechanics (Aligned)                                                                                                          
                                                                                                                                                               
-  Trait keys (20) and definitions remain unchanged from the Unity baseline. Trait values are non-negative integers with deltas between 0 and 3 per feed.      
+  Trait keys (20) and definitions remain unchanged. Trait values are non-negative integers with deltas between 0 and 3 per feed.      
                                                                                                                                                               
-  Stage progression (Egg → Baby → Teen → Adult), thresholds, and active trait display counts mirror Unity; Convex now stores state instead of in-memory/      
+  Stage progression (Egg → Baby → Teen → Adult), thresholds, and active trait display counts; Convex now stores state instead of in-memory/      
   localStorage.                                                                                                                                               
                                                                                                                                                               
   ## 4. Target Platforms                                                                                                                                      
@@ -69,7 +68,7 @@
   - Evolution: Convex threshold met → POST `/evolve` (daemonId) → sprite update, stage advancement, counter resets.                                           
   - Pet Manager Brainstorm: Open tab → click “Brainstorm” → POST `/pet-manager/brainstorm` → backend orchestrates Convex + Hyperspell data → Gemini prompt →  
   streamed response in UI.                                                                                                                                    
-  - Settings: Toggles for Use Cloud AI, Background Removal, Dev Mode (no “Save Session Locally” toggle).                                                      
+  - Settings: Toggles for Dev Mode.                                                      
                                                                                                                                                               
   ## 6. Functional Requirements                                                                                                                               
                                                                                                                                                               
@@ -214,28 +213,19 @@
   - Retry strategy: single retry for Convex/Hyperspell mutations; circuit breaker to mock AI on repeated failures.                                            
   - AgentMail webhook queue supports replay; dedupe via message ID.                                                                                           
                                                                                                                                                               
-  ## 11. Security & Privacy                                                                                                                                   
-                                                                                                                                                              
-  - AgentMail webhooks validated via shared secret/HMAC; rejected if invalid.
-  - Rate limiting per endpoint, with stricter limits on /feed-by-email.
-  - API keys stored server-side; frontend receives only necessary Convex config.
-  - MIME enforcement: strip HTML content, reject non-whitelisted attachment types, and cap attachment size before persisting or forwarding to Gemini.
-  - Vision calls run only against sanitized image buffers; executable and archive payloads are discarded.
-  - File content sanitized and discarded after processing; only derived summaries stored.
-  - Gemini prompts enforce safety guidelines; outputs filtered before display.
-  - Audit logging for webhook events and Convex mutations with trace IDs.
-                                                                                                                                                              
-  ## 12. Accessibility & Localization                                                                                                                         
-                                                                                                                                                              
-  - Keyboard-accessible switcher, drop zone, and Pet Manager controls.                                                                                        
-  - ARIA roles for tabs, speech bubbles, feed history.                                                                                                        
-  - English UI with i18n scaffolding for future localization.                                                                                                 
-                                                                                                                                                              
-  ## 13. Observability                                                                                                                                        
-                                                                                                                                                              
-  - Frontend: Sentry for errors, analytics for Daemon switching, feed success rate, Convex subscription latency.                                              
-  - Backend: structured logs (trace IDs, daemonId, latency), metrics for AI latency, webhook throughput, Convex mutation duration, Hyperspell errors.         
-  - Dashboard: webhook success/failure counts, retry logs, brainstorm usage.                                                                                  
+  ## 11. Security & Privacy
+
+  - Shared secret check on AgentMail webhook; reject invalid signatures.
+  - Keep API keys server-side; wipe raw attachments after processing.
+
+  ## 12. Accessibility & Localization
+
+  - Ensure tab/keyboard access for switcher, drop zone, and brainstorm button.
+  - English-only copy for the hackathon demo.
+
+  ## 13. Observability
+
+  - Console logs + simple Dev Mode panel for debugging (feed timeline, webhook payload).
                                                                                                                                                               
   ## 14. Testing & Acceptance Criteria                                                                                                                        
                                                                                                                                                               
@@ -305,7 +295,8 @@
   - AgentMail SLA and retry budget—confirm sandbox credentials and throughput.                                                                                
   - Hyperspell retention policy and quota management.                                                                                                         
   - Final brainstorm response format (streamed text vs. structured JSON) prior to Week 3 build.                                                               
-  - Naming conventions for public Daemon inboxes for demo audiences.                                                                                          
+  - Naming conventions for public Daemon inboxes for demo audiences.  
+  - Observability across frontend, backend, and third-party services.                                                                                          
                                                                                                                                                               
   ## 18. Stretch Goals (Post-MVP)                                                                                                                             
                                                                                                                                                               

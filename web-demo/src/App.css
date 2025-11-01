@@ -1,0 +1,24 @@
+/* App layout */
+#root { height: 100vh; display: flex; }
+.app-root { display: flex; flex-direction: column; width: 100%; }
+.app-header { padding: 10px 16px; border-bottom: 1px solid #2a2f3a; text-align: left; }
+.app-header h1 { margin: 0; font-size: 20px; }
+.app-header .subtitle { margin: 4px 0 0; color: #9aa3b2; font-size: 12px; }
+.app-main { display: flex; flex: 1; }
+.app-main .left { flex: 2; display: flex; flex-direction: column; gap: 8px; padding: 8px; }
+.app-main .right { width: 320px; border-left: 1px solid #2a2f3a; padding: 8px; }
+.app-footer { padding: 8px 16px; border-top: 1px solid #2a2f3a; color: #9aa3b2; font-size: 12px; text-align: left; }
+
+/* Drop zone */
+.drop-zone { border: 1px dashed #3b4252; padding: 10px; border-radius: 6px; min-height: 60px; display: flex; align-items: center; }
+.drop-zone.hover { background: #262b36; }
+.drop-zone .btn { margin-left: 8px; }
+
+/* Pixi stage container */
+.pixi-stage { flex: 1; border: 1px solid #2a2f3a; border-radius: 6px; overflow: hidden; }
+
+/* Traits panel */
+.trait-panel h2 { margin-top: 0; }
+.trait-panel ul { list-style: none; padding: 0; margin: 0; }
+.trait-panel li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #2a2f3a; }
+.trait-panel .roast { margin-top: 12px; }
