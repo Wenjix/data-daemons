@@ -90,14 +90,15 @@ def list_inboxes():
         return None
 
 def send_test_email(inbox_id, daemon=None):
-    """Send a test email to text-pet@agentmail.to with optional daemon routing."""
-    # Build recipient email with daemon routing
+    """Send a test email to daemon-specific mailbox."""
+    # Build recipient email using dedicated mailboxes
     if daemon:
-        recipient = f"text-pet+{daemon.lower()}@agentmail.to"
+        recipient = f"{daemon.lower()}-pet@agentmail.to"
         print(f"\n[SEND] Sending test email to {daemon.upper()} daemon...")
+        print(f"       Using dedicated mailbox: {recipient}")
     else:
-        recipient = "text-pet@agentmail.to"
-        print(f"\n[SEND] Sending test email (default routing)...")
+        recipient = "nova-pet@agentmail.to"  # Default to Nova
+        print(f"\n[SEND] Sending test email (default routing to Nova)...")
 
     print(f"       From inbox: {inbox_id}")
     print(f"       To: {recipient}")
@@ -112,20 +113,20 @@ def send_test_email(inbox_id, daemon=None):
         subject_line = f"Test Email for {daemon.upper()} Daemon"
         text_body = (
             f"This is a test email specifically routed to the {daemon.upper()} daemon.\n\n"
-            f"Using plus-tag addressing: {recipient}\n\n"
+            f"Using dedicated mailbox: {recipient}\n\n"
             "This verifies:\n"
             f"- {daemon.upper()} daemon receives and processes feeds independently ✅\n"
-            "- Plus-tag routing logic works correctly ✅\n"
+            "- Dedicated mailbox routing works correctly ✅\n"
             "- Webhook integration is functioning ✅\n\n"
             f"Check Convex database to verify {daemon.upper()}'s traits were updated!"
         )
         html_body = (
             f"<p>This is a <strong>test email</strong> specifically routed to the <strong>{daemon.upper()}</strong> daemon.</p>"
-            f"<p>Using plus-tag addressing: <code>{recipient}</code></p>"
+            f"<p>Using dedicated mailbox: <code>{recipient}</code></p>"
             "<p>This verifies:</p>"
             "<ul>"
             f"<li>{daemon.upper()} daemon receives and processes feeds independently ✅</li>"
-            "<li>Plus-tag routing logic works correctly ✅</li>"
+            "<li>Dedicated mailbox routing works correctly ✅</li>"
             "<li>Webhook integration is functioning ✅</li>"
             "</ul>"
             f"<p><em>Check Convex database to verify {daemon.upper()}'s traits were updated!</em></p>"

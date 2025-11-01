@@ -169,3 +169,15 @@ export const errored = mutation({
     return feed._id;
   },
 });
+
+export const listByDaemon = query({
+  args: { daemonId: v.id("daemons") },
+  handler: async (ctx, args) => {
+    const all = await ctx.db
+      .query("feeds")
+      .filter((q) => q.eq(q.field("daemonId"), args.daemonId))
+      .collect();
+    // Sort by createdAt desc
+    return all.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  },
+});

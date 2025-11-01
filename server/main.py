@@ -168,7 +168,7 @@ def _extract_message_fields(payload: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def _resolve_daemon_id(to_field: Any) -> Optional[str]:
-    # Accept string or list of strings; parse plus-tag as daemon hint
+    # Accept string or list of strings; route to daemon based on email address
     if convex_client is None:
         return None
     try:
@@ -187,11 +187,28 @@ def _resolve_daemon_id(to_field: Any) -> Optional[str]:
     elif isinstance(to_field, list):
         recipients = [str(x) for x in to_field]
 
+    # Dedicated mailbox mappings (exact matches take priority)
+    mailbox_to_daemon = {
+        "nova-pet": "nova",
+        "pixel-pet": "pixel",
+        "echo-pet": "echo",
+    }
+
     for r in recipients:
-        addr = r.strip()
+        addr = r.strip().lower()
         if "@" not in addr:
             continue
         local = addr.split("@", 1)[0]
+
+        # PRIORITY 1: Check for dedicated mailbox (exact match)
+        for mailbox_prefix, daemon_name in mailbox_to_daemon.items():
+            if local == mailbox_prefix:
+                # Match daemon by name
+                for d in daemons:
+                    if str(d.get("name", "")).lower() == daemon_name:
+                        return d["_id"]
+
+        # PRIORITY 2: Check for plus-tag routing (backward compatibility)
         hint = None
         if "+" in local:
             hint = local.split("+", 1)[1]
@@ -203,6 +220,8 @@ def _resolve_daemon_id(to_field: Any) -> Optional[str]:
             for d in daemons:
                 if str(d.get("name", "")).lower() == hint.lower():
                     return d["_id"]
+
+    # PRIORITY 3: Default to first daemon
     return pick_first()
 
 

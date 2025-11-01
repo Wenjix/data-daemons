@@ -1,11 +1,35 @@
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Typography */
+  font-family: 'Source Sans 3', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
+  /* Visual Spec Design Tokens */
+  --color-bg: #0c0f12; /* obsidian base */
+  --color-void-teal: #06545e; /* void teal */
+  --color-ember-magenta: #d94b8a; /* ember magenta */
+  --color-spectral-cyan: #6ff4ff; /* spectral cyan */
+  --color-gold: #f2c572; /* pearlescent gold */
+  --gradient-ember-to-cyan: linear-gradient(90deg, #d94b8a, #6ff4ff);
+
+  --radii-pedestal: 32px;
+  --radii-panel: 16px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+
+  --shadow-altar: 0 20px 60px rgba(6,84,94,0.35);
+  --focus-ring-cyan: 0 0 0 2px var(--color-spectral-cyan), 0 0 0 4px #0c0f12;
+
+  --duration-quick: 150ms;
+  --duration-summon: 600ms;
+  --easing-summon: cubic-bezier(.23,1,.32,1);
+
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #1b1e24;
+  background-color: var(--color-bg);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,13 +48,31 @@ body {
   min-height: 100vh;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1, h2, h3 {
+  font-family: 'Orbitron', 'Source Sans 3', sans-serif;
+  font-weight: 600;
 }
 
-button { border-radius: 6px; border: 1px solid #3b4252; padding: 6px 10px; background: #202431; color: #e5e9f0; }
-button:hover { border-color: #7b88a1; }
-button:focus, button:focus-visible { outline: 2px solid #7b88a1; }
+button {
+  border-radius: 56px; /* primary pill */
+  border: 1px solid rgba(217,75,138,0.6);
+  padding: 10px 16px;
+  background: #202431;
+  color: #e5e9f0;
+  box-shadow: inset 0 0 12px rgba(111,244,255,0.15);
+  transition: box-shadow var(--duration-quick), border-color var(--duration-quick);
+}
+button:hover { border-color: var(--color-spectral-cyan); box-shadow: inset 0 0 16px rgba(111,244,255,0.28); }
+button:focus, button:focus-visible { outline: none; box-shadow: var(--focus-ring-cyan); }
 
-/* Remove light theme overrides to keep consistent dark theme */
+/* Utility */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

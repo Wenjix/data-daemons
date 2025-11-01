@@ -1,24 +1,103 @@
-/* App layout */
+/* Root layout */
 #root { height: 100vh; display: flex; }
 .app-root { display: flex; flex-direction: column; width: 100%; }
-.app-header { padding: 10px 16px; border-bottom: 1px solid #2a2f3a; text-align: left; }
-.app-header h1 { margin: 0; font-size: 20px; }
+.app-header { padding: var(--space-3) var(--space-4); border-bottom: 1px solid #2a2f3a; text-align: left; background: radial-gradient(1200px 300px at 10% -10%, rgba(111,244,255,0.08), transparent);
+}
+.app-header h1 { margin: 0; font-size: 22px; letter-spacing: 0.5px; }
 .app-header .subtitle { margin: 4px 0 0; color: #9aa3b2; font-size: 12px; }
-.app-main { display: flex; flex: 1; }
-.app-main .left { flex: 2; display: flex; flex-direction: column; gap: 8px; padding: 8px; }
-.app-main .right { width: 320px; border-left: 1px solid #2a2f3a; padding: 8px; }
-.app-footer { padding: 8px 16px; border-top: 1px solid #2a2f3a; color: #9aa3b2; font-size: 12px; text-align: left; }
+
+.app-main { display: grid; grid-template-columns: 300px 1fr 360px; grid-template-rows: auto 1fr; flex: 1; }
+.left-rail { border-right: 1px solid #2a2f3a; padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
+.canvas-zone { position: relative; padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
+.right-panel { border-left: 1px solid #2a2f3a; padding: var(--space-3); }
+
+.app-footer { padding: var(--space-2) var(--space-4); border-top: 1px solid #2a2f3a; color: #9aa3b2; font-size: 12px; text-align: left; }
 
 /* Drop zone */
-.drop-zone { border: 1px dashed #3b4252; padding: 10px; border-radius: 6px; min-height: 60px; display: flex; align-items: center; }
-.drop-zone.hover { background: #262b36; }
+.drop-zone { border: 1px dashed #3b4252; padding: 10px; border-radius: var(--radii-panel); min-height: 72px; display: flex; align-items: center; background: rgba(255,255,255,0.02); }
+.drop-zone.hover { background: rgba(242,197,114,0.08); outline: 1px solid rgba(242,197,114,0.3); transform: rotate(0.5deg); }
 .drop-zone .btn { margin-left: 8px; }
 
 /* Pixi stage container */
-.pixi-stage { flex: 1; border: 1px solid #2a2f3a; border-radius: 6px; overflow: hidden; }
+.pixi-stage { flex: 1; border: 1px solid #2a2f3a; border-radius: var(--radii-panel); overflow: hidden; position: relative; box-shadow: var(--shadow-altar);
+}
 
-/* Traits panel */
+/* Pedestals overlay */
+.pedestals { position: absolute; inset: 0; pointer-events: none; }
+.pedestal { position: absolute; width: 140px; height: 140px; border-radius: var(--radii-pedestal); background: radial-gradient(120px 80px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick);
+}
+.pedestal.inactive { transform: scale(0.6); }
+.pedestal.active { transform: scale(1.1); outline: 1px solid rgba(111,244,255,0.35); }
+.pedestal.errored { outline: 2px solid rgba(200,40,60,0.6); }
+.pedestal .name { font-size: 12px; color: #c5cedd; }
+
+/* Positions for triangular arrangement */
+.pedestal.pos-a { left: 10%; top: 12%; }
+.pedestal.pos-b { right: 12%; top: 16%; }
+.pedestal.pos-c { left: 40%; bottom: 10%; }
+
+/* Inbox egg glyph */
+.inbox-egg { pointer-events: auto; width: 64px; height: 84px; border-radius: 50% 50% 46% 46% / 58% 58% 42% 42%; position: relative; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(111,244,255,0.35); box-shadow: inset 0 0 12px rgba(111,244,255,0.16); cursor: pointer; }
+.inbox-egg:hover { box-shadow: inset 0 0 18px rgba(111,244,255,0.26); }
+.inbox-egg .rune { width: 26px; height: 18px; border: 2px solid var(--color-spectral-cyan); border-bottom: none; position: relative; }
+.inbox-egg .rune::after { content: ''; position: absolute; left: 50%; transform: translateX(-50%); top: 8px; width: 19px; height: 2px; background: var(--color-spectral-cyan); }
+.inbox-egg .badge { position: absolute; top: -6px; right: -6px; background: var(--color-ember-magenta); color: white; border-radius: 10px; padding: 2px 6px; font-size: 10px; }
+.inbox-egg .tooltip { position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(111,244,255,0.3); padding: 4px 8px; border-radius: 8px; font-size: 11px; white-space: nowrap; }
+
+/* Feed timeline cards */
+.feed-timeline { display: flex; flex-direction: column; gap: 10px; }
+.feed-card { position: relative; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radii-panel); padding: 8px 12px; box-shadow: var(--shadow-altar); }
+.feed-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--color-void-teal); border-radius: var(--radii-panel) 0 0 var(--radii-panel); }
+.feed-card .meta { display: flex; gap: 8px; font-size: 12px; color: #9aa3b2; }
+.feed-badge { display: inline-block; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+.feed-badge.email { background: rgba(217,75,138,0.15); border: 1px solid rgba(217,75,138,0.35); }
+.feed-badge.drag-drop { background: rgba(111,244,255,0.15); border: 1px solid rgba(111,244,255,0.35); }
+.feed-status.processing { color: #f2c572; }
+.feed-status.completed { color: #6ff4ff; }
+.feed-status.errored { color: #d94b8a; }
+
+/* Traits panel with HUD chips */
 .trait-panel h2 { margin-top: 0; }
-.trait-panel ul { list-style: none; padding: 0; margin: 0; }
-.trait-panel li { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dotted #2a2f3a; }
+.trait-panel ul { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.trait-panel li { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(255,255,255,0.03); }
+.trait-panel .trait-name { font-weight: 600; }
+.trait-panel .trait-val { font-weight: 600; color: var(--color-gold); }
 .trait-panel .roast { margin-top: 12px; }
+
+/* Daemon Detail view */
+.detail-root { display: flex; flex-direction: column; width: 100%; height: calc(100vh - 40px); }
+.detail-header { display: flex; align-items: center; gap: 12px; padding: var(--space-3) var(--space-4); border-bottom: 1px solid #2a2f3a; background: radial-gradient(1200px 300px at 90% -10%, rgba(217,75,138,0.08), transparent); }
+.detail-header h2 { margin: 0; font-size: 20px; letter-spacing: 0.4px; }
+.detail-header button { padding: 6px 10px; }
+.detail-main { display: grid; grid-template-columns: 520px 1fr; gap: var(--space-4); padding: var(--space-4); }
+.detail-left, .detail-right { display: flex; flex-direction: column; gap: var(--space-4); }
+
+/* Holo diagram + HUD chips */
+.holo-diagram { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radii-panel); background: rgba(255,255,255,0.03); box-shadow: var(--shadow-altar); padding: 10px; }
+.holo-diagram .hud-chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+.hud-chip { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; background: rgba(111,244,255,0.06); }
+.hud-chip .chip-label { font-weight: 600; font-size: 12px; }
+.hud-chip .chip-val { font-weight: 700; color: var(--color-gold); }
+
+/* Inbox panel */
+.inbox-panel { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radii-panel); background: rgba(255,255,255,0.03); box-shadow: var(--shadow-altar); padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.inbox-panel .email-line { display: flex; align-items: center; gap: 8px; }
+.inbox-panel .email-line code { background: rgba(0,0,0,0.4); border: 1px solid rgba(111,244,255,0.25); border-radius: 8px; padding: 2px 6px; }
+.inbox-panel .latest-meta { display: flex; gap: 8px; color: #9aa3b2; font-size: 12px; }
+.inbox-panel .upload-cta .btn { cursor: pointer; }
+
+/* Rune-ring sliders */
+.rune-rings { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radii-panel); background: rgba(255,255,255,0.03); box-shadow: var(--shadow-altar); padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: center; }
+.rune-group { display: flex; flex-direction: column; gap: 6px; }
+.rune-group label { font-weight: 600; font-size: 12px; color: #c5cedd; }
+.rune-apply { grid-column: span 2; display: flex; justify-content: flex-end; }
+
+/* Tab strip */
+.tab-strip { border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radii-panel); background: rgba(255,255,255,0.03); box-shadow: var(--shadow-altar); padding: 12px; }
+.tab-strip .tabs { display: flex; gap: 8px; margin-bottom: 10px; }
+.tab-strip .tabs button { padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); }
+.tab-strip .tabs button.active { background: rgba(217,75,138,0.15); border-color: rgba(217,75,138,0.35); }
+.abilities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.ability-card { border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; background: rgba(255,255,255,0.04); }
+.ability-card .sigil { width: 100%; height: 56px; border: 1px dashed rgba(111,244,255,0.25); border-radius: 8px; margin-bottom: 8px; }
+.equipment-item { font-size: 13px; color: #c5cedd; }

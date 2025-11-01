@@ -1,6 +1,6 @@
 {
-  "to": ["text-pet+pixel@agentmail.to"],
+  "to": ["pixel-pet@agentmail.to"],
   "subject": "Test Feed for Pixel Daemon",
-  "text": "This message is specifically routed to Pixel using the +pixel plus-tag. Pixel should process this feed and update its traits independently from Nova and Echo.",
-  "message_id": "test-pixel-routing-001"
+  "text": "This message is specifically routed to Pixel using the dedicated pixel-pet@agentmail.to mailbox. Pixel should process this feed and update its traits independently from Nova and Echo.",
+  "message_id": "test-pixel-routing-002"
 }
