@@ -28,7 +28,8 @@ export function Stage() {
         // This avoids the resizeTo bug in Pixi.js v8 with React StrictMode
         const container = containerRef.current
         const width = container.clientWidth || 800
-        const height = container.clientHeight || 600
+        // Use fixed height to match CSS max-height constraint
+        const height = 600
 
         await app.init({
           width,
@@ -59,19 +60,12 @@ export function Stage() {
           app.ticker.maxFPS = 60
         }
 
-        // Simple placeholder graphics for Egg stage
+        // Main daemon visualization - positioned at top-center
+        const centerX = width / 2
         const graphics = new PIXI.Graphics()
-        graphics.circle(200, 200, 80)
+        graphics.circle(centerX, 120, 100)  // Larger circle at top-center
         graphics.fill(0xffffcc)
         app.stage.addChild(graphics)
-
-        const text = new PIXI.Text({
-          text: `${stageName} • satisfaction ${satisfaction}/5`,
-          style: { fill: 0xffffff, fontSize: 18 },
-        })
-        text.x = 20
-        text.y = 20
-        app.stage.addChild(text)
 
         // Offload heavy effects to shader cache placeholder: pre-create a simple filter
         // In future, heavier effects should be preloaded and reused.
