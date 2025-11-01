@@ -26,6 +26,7 @@ from schemas import (
 from prompt_builder import build_analysis_prompt, build_evolution_prompt, build_name_prompt
 from llm_providers import get_llm_provider, LLMProvider
 from personality import build_personality_context
+from hyperspell_client import add_daemon_memory, search_daemon_memories, get_recent_daemon_memories
 import logging
 
 logger = logging.getLogger(__name__)
@@ -567,12 +568,150 @@ async def feed_by_email(request: Request):
         # Best-effort completion; if Convex fails, surface as 500
         raise HTTPException(status_code=500, detail=f"Convex complete error: {e}")
 
+    # Add memory to Hyperspell
+    daemon_name = daemon_doc.get("name", "Unknown") if daemon_doc else "Unknown"
+    add_daemon_memory(
+        daemon_id=daemon_id,
+        daemon_name=daemon_name,
+        caption=result.caption or content_summary,
+        roast=result.roast or "",
+        source="email",
+        content_type="txt" if text else "image",
+        timestamp=now,
+    )
+
     return {
         "status": "success",
         "feedId": message_id,
         "daemonId": daemon_id,
         "source": "email",
     }
+
+@router.post("/pet-manager/brainstorm")
+async def pet_manager_brainstorm(request: Request):
+    """
+    Pet Manager brainstorm endpoint that synthesizes all daemon traits and memories
+    into creative output using Gemini.
+    """
+    try:
+        payload = await request.json()
+    except Exception:
+        payload = {}
+
+    topic = payload.get("topic")
+
+    # Fetch all daemons from Convex
+    if convex_client is None:
+        raise HTTPException(status_code=503, detail="Convex client unavailable")
+
+    try:
+        daemons = convex_client.query("daemons:all", {}) or []
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch daemons: {e}")
+
+    if not daemons:
+        raise HTTPException(status_code=404, detail="No daemons found")
+
+    # Build context for each daemon with their memories
+    daemon_contexts = []
+    for daemon in daemons:
+        daemon_id = daemon["_id"]
+        daemon_name = daemon.get("name", "Unknown")
+        traits = daemon.get("traits", {})
+
+        # Get top 3 traits
+        top_traits = sorted(traits.items(), key=lambda x: x[1], reverse=True)[:3]
+        trait_summary = ", ".join([f"{t[0]} ({t[1]})" for t in top_traits])
+
+        # Get recent memories from Hyperspell
+        memories = get_recent_daemon_memories(daemon_id, limit=5)
+        memory_summary = ""
+        if memories:
+            memory_texts = [m.get("content", "") for m in memories[:3]]
+            memory_summary = " | ".join(memory_texts[:3])
+
+        daemon_contexts.append({
+            "name": daemon_name,
+            "traits": trait_summary,
+            "memories": memory_summary or "No recent memories",
+        })
+
+    # Build the brainstorm prompt
+    prompt_parts = [
+        "You are the Pet Manager, a creative AI that synthesizes insights from multiple Data Daemons.",
+        "Each daemon has unique personality traits and memories from the content they've consumed.",
+        "",
+        "Here are your daemons:",
+        ""
+    ]
+
+    for ctx in daemon_contexts:
+        prompt_parts.append(f"**{ctx['name']}**")
+        prompt_parts.append(f"  Top Traits: {ctx['traits']}")
+        prompt_parts.append(f"  Recent Memories: {ctx['memories']}")
+        prompt_parts.append("")
+
+    if topic:
+        prompt_parts.append(f"Topic: {topic}")
+        prompt_parts.append("")
+
+    prompt_parts.extend([
+        "Based on the above daemons' traits and memories, brainstorm a creative idea or insight.",
+        "Structure your response as JSON with:",
+        '- "brainstormIdea": A creative idea that synthesizes insights from all daemons',
+        '- "contributions": An array of objects with "daemonName", "role", and "highlight" for each daemon',
+        "",
+        "Make it engaging and reference specific traits and memories from each daemon.",
+    ])
+
+    prompt = "\n".join(prompt_parts)
+
+    # Use LLM or fall back to mock
+    use_llm = not MOCK_MODE and llm_provider is not None
+
+    if use_llm:
+        try:
+            logger.info("Calling LLM provider for Pet Manager brainstorm")
+            response = llm_provider.generate_content(prompt)
+            result = response.parse_json()
+
+            brainstorm_idea = result.get("brainstormIdea", "")
+            contributions = result.get("contributions", [])
+
+            # Store in Convex
+            now = int(__import__("time").time() * 1000)
+            try:
+                convex_client.mutation("managerLogs:logBrainstorm", {
+                    "brainstormIdea": brainstorm_idea,
+                    "contributions": contributions,
+                    "now": now,
+                })
+            except Exception as e:
+                logger.error(f"Failed to store brainstorm in Convex: {e}")
+
+            return {
+                "brainstormIdea": brainstorm_idea,
+                "contributions": contributions,
+            }
+
+        except Exception as e:
+            logger.error(f"Pet Manager brainstorm failed: {e}")
+            # Fall through to mock
+
+    # Mock mode
+    contributions = []
+    for ctx in daemon_contexts:
+        contributions.append({
+            "daemonName": ctx["name"],
+            "role": "Contributor",
+            "highlight": f"Brings {ctx['traits'].split(',')[0]} to the table",
+        })
+
+    return {
+        "brainstormIdea": f"A collaborative project combining the unique strengths of {len(daemons)} daemons!",
+        "contributions": contributions,
+    }
+
 
 # Direct route registration for demo reliability
 @app.post("/feed-by-email")

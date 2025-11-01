@@ -25,9 +25,53 @@
 /* Summoner portrait overlay */
 .summoner-portrait { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 200px; height: 200px; border-radius: 50%; object-fit: cover; pointer-events: none; z-index: 1; }
 
+/* Spell controls (in trait panel) */
+.spell-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.spell-controls .spell-btn {
+  width: 100%;
+  cursor: pointer;
+  border-radius: 56px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.spell-controls .spell-btn.purple {
+  border: 1px solid rgba(114, 75, 217, 0.6);
+  background: linear-gradient(135deg,
+    rgba(114, 75, 217, 0.3),
+    rgba(217, 75, 138, 0.3));
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 0 12px rgba(114, 75, 217, 0.2),
+              0 4px 12px rgba(114, 75, 217, 0.3);
+}
+
+.spell-controls .spell-btn.purple:hover {
+  border-color: rgba(114, 75, 217, 0.9);
+  background: linear-gradient(135deg,
+    rgba(114, 75, 217, 0.5),
+    rgba(217, 75, 138, 0.4));
+  box-shadow: inset 0 0 16px rgba(114, 75, 217, 0.35),
+              0 6px 20px rgba(114, 75, 217, 0.5);
+  transform: translateY(-2px);
+}
+
+.spell-controls .spell-btn.purple:active {
+  transform: translateY(0);
+  box-shadow: inset 0 0 20px rgba(114, 75, 217, 0.5),
+              0 2px 8px rgba(114, 75, 217, 0.4);
+}
+
 /* Pedestals overlay */
 .pedestals { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
-.pedestal { position: absolute; width: 240px; height: 300px; border-radius: var(--radii-pedestal); background: radial-gradient(180px 120px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick);
+.pedestal { position: absolute; width: 240px; height: 300px; border-radius: var(--radii-pedestal); background: radial-gradient(180px 120px at 50% 50%, rgba(111,244,255,0.08), rgba(217,75,138,0.06)); border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 20px rgba(111,244,255,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform-origin: center; transition: transform var(--duration-quick), outline var(--duration-quick); pointer-events: auto; cursor: pointer;
 }
 .pedestal.inactive { transform: scale(1); }
 .pedestal.active { transform: scale(1); outline: 1px solid rgba(111,244,255,0.35); }
@@ -41,7 +85,16 @@
 .pedestal .action-btn:active { transform: scale(0.95); }
 
 /* Nameplate integrated into pedestal base */
-.pedestal .nameplate { width: 140px; padding: 6px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; font-size: 13px; font-weight: 600; color: #c5cedd; text-align: center; letter-spacing: 0.3px; }
+.pedestal .nameplate { width: 140px; padding: 6px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; font-size: 13px; font-weight: 600; color: #c5cedd; text-align: center; letter-spacing: 0.3px; transition: all 0.2s ease; }
+.pedestal:hover .nameplate { transform: translateY(-2px); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+/* Daemon-specific nameplate colors */
+.pedestal .nameplate-nova { background: rgba(255,59,59,0.12); border-color: rgba(255,59,59,0.4); color: #ff6b6b; }
+.pedestal:hover .nameplate-nova { background: rgba(255,59,59,0.18); border-color: rgba(255,59,59,0.6); }
+.pedestal .nameplate-pixel { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.4); color: #c084fc; }
+.pedestal:hover .nameplate-pixel { background: rgba(168,85,247,0.18); border-color: rgba(168,85,247,0.6); }
+.pedestal .nameplate-echo { background: rgba(20,184,166,0.12); border-color: rgba(20,184,166,0.4); color: #5eead4; }
+.pedestal:hover .nameplate-echo { background: rgba(20,184,166,0.18); border-color: rgba(20,184,166,0.6); }
 
 /* Organized horizontal row at bottom */
 .pedestal.pos-a { left: 15%; bottom: 80px; }
@@ -76,6 +129,71 @@
 .trait-panel .trait-name { font-weight: 600; }
 .trait-panel .trait-val { font-weight: 600; color: var(--color-gold); }
 .trait-panel .roast { margin-top: 12px; }
+
+/* Magic Indicators - Context and Memory Status */
+.magic-indicators {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 12px;
+}
+
+.magic-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(114, 75, 217, 0.35);
+  background: rgba(114, 75, 217, 0.15);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.magic-indicator.active {
+  background: rgba(114, 75, 217, 0.3);
+  border-color: rgba(114, 75, 217, 0.6);
+  box-shadow: 0 0 12px rgba(114, 75, 217, 0.3);
+}
+
+.magic-indicator.inactive {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  opacity: 0.7;
+}
+
+.indicator-label {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.indicator-value {
+  color: var(--color-gold);
+  text-transform: capitalize;
+}
+
+.magic-indicator.active .indicator-value {
+  color: rgba(114, 75, 217, 1);
+  text-shadow: 0 0 8px rgba(114, 75, 217, 0.5);
+}
+
+/* Special styling for recalled memory state */
+.magic-indicator.inactive .indicator-value {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.magic-indicator.recalled {
+  background: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.5);
+  opacity: 1;
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.2);
+}
+
+.magic-indicator.recalled .indicator-value {
+  color: rgba(76, 175, 80, 1);
+  text-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+}
 
 /* Roast Display - Speech Bubble with Streaming Text */
 .roast-display {

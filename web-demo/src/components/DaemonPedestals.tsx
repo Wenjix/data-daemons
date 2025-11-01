@@ -95,7 +95,7 @@ function DaemonPedestal({
       )}
 
       {/* Nameplate */}
-      <div className="nameplate">{daemon.name}</div>
+      <div className={`nameplate nameplate-${daemon.name.toLowerCase()}`}>{daemon.name}</div>
     </div>
   )
 }

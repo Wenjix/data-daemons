@@ -1,0 +1,6 @@
+{
+  "to": ["echo-pet@agentmail.to"],
+  "subject": "Math Assignment Due Friday - Calculus Problem Set",
+  "text": "Here's the homework assignment for this week. We need to complete Chapter 7, problems 1-20 focusing on integration techniques. The problem set covers integration by parts, trigonometric substitution, and partial fractions. Make sure to show all your work - Dr. Martinez is really strict about that. Problems 15-18 are particularly challenging, they involve both u-substitution and integration by parts in the same problem. Remember to check your answers by differentiating! Also, don't forget that we need to include a written explanation for problems 19-20 about why we chose each integration method. The assignment is worth 50 points and counts toward our midterm grade. If you get stuck on the trig substitution problems, review the examples from Tuesday's lecture - they're really helpful. Study group is meeting Thursday night if anyone wants to work through these together before the Friday deadline.",
+  "message_id": "test-echo-routing-003"
+}

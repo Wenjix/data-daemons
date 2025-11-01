@@ -328,3 +328,52 @@ button:focus, button:focus-visible { outline: none; box-shadow: var(--focus-ring
   border-width: 14px 14px 0;
   filter: drop-shadow(3px 3px 0 rgba(0, 0, 0, 1));
 }
+
+/* Memphis magic indicators */
+.memphis-design .magic-indicator {
+  border: 3px solid #000000;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.8);
+}
+
+.memphis-design .magic-indicator.active {
+  background: var(--color-spectral-cyan);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+}
+
+.memphis-design .magic-indicator.inactive {
+  background: #ffffff;
+  opacity: 1;
+}
+
+.memphis-design .indicator-label,
+.memphis-design .indicator-value {
+  color: #000000;
+  text-shadow: none;
+}
+
+/* Memphis recalled memory state */
+.memphis-design .magic-indicator.recalled {
+  background: #90EE90;
+  border: 3px solid #000000;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+}
+
+.memphis-design .magic-indicator.recalled .indicator-label,
+.memphis-design .magic-indicator.recalled .indicator-value {
+  color: #000000;
+}
+
+/* Memphis spell buttons */
+.memphis-design .spell-btn.purple {
+  border: 3px solid #000000;
+  background: linear-gradient(135deg, #724bd9, #d94b8a);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 1);
+  border-radius: 12px;
+  font-weight: 900;
+}
+
+.memphis-design .spell-btn.purple:hover {
+  background: linear-gradient(135deg, #8a5fe9, #e95ba0);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 1);
+}

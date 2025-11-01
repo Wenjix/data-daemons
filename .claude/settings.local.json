@@ -8,7 +8,9 @@
       "mcp__playwright__browser_navigate",
       "mcp__playwright__browser_take_screenshot",
       "mcp__playwright__browser_hover",
-      "mcp__playwright__browser_click"
+      "mcp__playwright__browser_click",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__list_dir"
     ],
     "deny": [],
     "ask": []
