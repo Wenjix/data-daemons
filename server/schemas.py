@@ -71,6 +71,7 @@ class AnalyzeRequest(BaseModel):
     imageBase64: Optional[str] = None
     currentTraits: PersonalityTraits = Field(default_factory=PersonalityTraits)
     dominantTrait: Optional[TraitKey] = None
+    currentArchetypeId: Optional[str] = None
 
 
 class AnalyzeResponse(BaseModel):
@@ -78,6 +79,8 @@ class AnalyzeResponse(BaseModel):
     tags: List[str] = Field(default_factory=list)
     roast: Optional[str] = None
     traitDeltas: List[TraitDelta] = Field(default_factory=list)
+    newArchetypeId: Optional[str] = None
+    topTraits: List[str] = Field(default_factory=list)
 
 
 class EvolveRequest(BaseModel):

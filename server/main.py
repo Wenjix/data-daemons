@@ -11,7 +11,7 @@ import json
 import uuid
 from typing import Any, Dict, List, Optional
 
-from server.schemas import (
+from schemas import (
     AnalyzeRequest,
     AnalyzeResponse,
     EvolveRequest,
@@ -21,8 +21,14 @@ from server.schemas import (
     RemoveBackgroundRequest,
     RemoveBackgroundResponse,
     SpriteData,
+    PersonalityTraits,
 )
-from server.prompt_builder import build_analysis_prompt, build_evolution_prompt, build_name_prompt
+from prompt_builder import build_analysis_prompt, build_evolution_prompt, build_name_prompt
+from llm_providers import get_llm_provider, LLMProvider
+from personality import build_personality_context
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 load_dotenv()
@@ -56,6 +62,19 @@ if CONVEX_URL:
         convex_client = ConvexClient(CONVEX_URL)
     except Exception:
         convex_client = None
+
+# LLM provider initialization
+LLM_FALLBACK_ENABLED = os.getenv("LLM_FALLBACK_ENABLED", "true").lower() == "true"
+llm_provider: Optional[LLMProvider] = None
+try:
+    llm_provider = get_llm_provider(fallback_enabled=LLM_FALLBACK_ENABLED)
+    if llm_provider:
+        logger.info("LLM provider initialized successfully")
+    else:
+        logger.warning("No LLM provider available - will use mock mode")
+except Exception as e:
+    logger.error(f"Failed to initialize LLM provider: {e}")
+    llm_provider = None
 
 
 def _verify_agentmail_signature(raw_body: bytes, header_val: Optional[str]) -> bool:
@@ -237,48 +256,115 @@ async def analyze(payload: AnalyzeRequest) -> AnalyzeResponse:
     image_url = payload.imageUrl
     image_b64 = payload.imageBase64
     current_traits = payload.currentTraits.values or {}
+    current_archetype_id = payload.currentArchetypeId
 
-    # Always build prompt (useful for dev-mode panel), even if returning mocks
-    _prompt = build_analysis_prompt(text, file_desc, payload.currentTraits)
+    # Build personality-aware prompt
+    prompt = build_analysis_prompt(text, file_desc, payload.currentTraits, current_archetype_id)
 
-    if MOCK_MODE:
-        tags: list[str] = []
-        if text:
-            length = len(text)
-            tags.append("text")
-            tags.append("long" if length > 80 else "short")
-        if image_url or image_b64:
-            tags.append("image")
+    # Determine if we should use LLM or mocks
+    use_llm = not MOCK_MODE and llm_provider is not None
 
-        dom = None
-        if current_traits:
-            dom = max(current_traits.items(), key=lambda kv: (kv[1], kv[0]))[0]
-        roast = f"Your vibe screams {dom or 'mystery'} — try harder."[:80]
+    if use_llm:
+        try:
+            # Call LLM provider
+            logger.info("Calling LLM provider for analysis")
+            response = llm_provider.generate_content(prompt)
 
-        deltas = []
-        all_traits = [
-            "Intelligence","Creativity","Empathy","Resilience","Curiosity","Humor","Kindness","Confidence",
-            "Discipline","Honesty","Patience","Optimism","Courage","OpenMindedness","Prudence","Adaptability",
-            "Gratitude","Ambition","Humility","Playfulness",
-        ]
-        for t in all_traits:
-            deltas.append({"trait": t, "delta": 0})
-        if current_traits:
-            top4 = sorted(current_traits.items(), key=lambda kv: kv[1], reverse=True)[:4]
-            base_map = {d["trait"]: d["delta"] for d in deltas}
-            for trait, _score in top4:
-                base_map[trait] = min(3, base_map.get(trait, 0) + 1)
-            deltas = [{"trait": t, "delta": base_map[t]} for t in base_map]
+            # Parse JSON response
+            result = response.parse_json()
 
-        return AnalyzeResponse(
-            caption=file_desc or (text[:64] if text else None),
-            tags=tags,
-            roast=roast,
-            traitDeltas=[{"trait": d["trait"], "delta": d["delta"]} for d in deltas],
-        )
+            # Extract trait deltas
+            trait_deltas_dict = result.get("traitDeltas", {})
+            trait_deltas = [
+                {"trait": trait, "delta": trait_deltas_dict.get(trait, 0)}
+                for trait in [
+                    "Intelligence", "Creativity", "Empathy", "Resilience", "Curiosity",
+                    "Humor", "Kindness", "Confidence", "Discipline", "Honesty",
+                    "Patience", "Optimism", "Courage", "OpenMindedness", "Prudence",
+                    "Adaptability", "Gratitude", "Ambition", "Humility", "Playfulness"
+                ]
+            ]
 
-    # TODO: Implement real model call here (Gemini 2.0) and parse outputs
-    raise NotImplementedError("Model-backed analyze not implemented yet")
+            # Extract roast and enforce length constraints
+            roast = result.get("roast", "Interesting content!")
+            roast = roast[:140]  # Hard limit to 140 chars
+
+            # Generate tags based on content
+            tags = []
+            if text:
+                tags.append("text")
+                tags.append("long" if len(text) > 80 else "short")
+            if image_url or image_b64:
+                tags.append("image")
+
+            # Calculate new archetype after applying trait deltas
+            projected_traits = {**current_traits}
+            for td in trait_deltas:
+                trait_key = td["trait"]
+                projected_traits[trait_key] = projected_traits.get(trait_key, 0) + td["delta"]
+
+            projected_traits_obj = PersonalityTraits(values=projected_traits)
+            new_personality = build_personality_context(projected_traits_obj, current_archetype_id)
+
+            logger.info(f"LLM analysis successful. Roast: {roast[:50]}... Archetype: {new_personality.archetype_id}")
+            return AnalyzeResponse(
+                caption=file_desc or (text[:64] if text else None),
+                tags=tags,
+                roast=roast,
+                traitDeltas=trait_deltas,
+                newArchetypeId=new_personality.archetype_id,
+                topTraits=new_personality.top_traits,
+            )
+
+        except Exception as e:
+            logger.error(f"LLM analysis failed: {e}")
+            logger.info("Falling back to mock response")
+            # Fall through to mock logic
+
+    # Mock mode or LLM fallback
+    tags: list[str] = []
+    if text:
+        length = len(text)
+        tags.append("text")
+        tags.append("long" if length > 80 else "short")
+    if image_url or image_b64:
+        tags.append("image")
+
+    # Generate personality context for mock roast
+    personality = build_personality_context(payload.currentTraits, current_archetype_id)
+    roast = f"{personality.archetype_name} says: Your vibe screams {personality.top_traits[0] if personality.top_traits else 'mystery'} — try harder."[:140]
+
+    deltas = []
+    all_traits = [
+        "Intelligence","Creativity","Empathy","Resilience","Curiosity","Humor","Kindness","Confidence",
+        "Discipline","Honesty","Patience","Optimism","Courage","OpenMindedness","Prudence","Adaptability",
+        "Gratitude","Ambition","Humility","Playfulness",
+    ]
+    for t in all_traits:
+        deltas.append({"trait": t, "delta": 0})
+    if current_traits:
+        top4 = sorted(current_traits.items(), key=lambda kv: kv[1], reverse=True)[:4]
+        base_map = {d["trait"]: d["delta"] for d in deltas}
+        for trait, _score in top4:
+            base_map[trait] = min(3, base_map.get(trait, 0) + 1)
+        deltas = [{"trait": t, "delta": base_map[t]} for t in base_map]
+
+    # Calculate new archetype after applying mock deltas
+    projected_traits = {**current_traits}
+    for d in deltas:
+        projected_traits[d["trait"]] = projected_traits.get(d["trait"], 0) + d["delta"]
+
+    projected_traits_obj = PersonalityTraits(values=projected_traits)
+    new_personality = build_personality_context(projected_traits_obj, current_archetype_id)
+
+    return AnalyzeResponse(
+        caption=file_desc or (text[:64] if text else None),
+        tags=tags,
+        roast=roast,
+        traitDeltas=[{"trait": d["trait"], "delta": d["delta"]} for d in deltas],
+        newArchetypeId=new_personality.archetype_id,
+        topTraits=new_personality.top_traits,
+    )
 
 
 @router.post("/evolve", response_model=EvolveResponse)
