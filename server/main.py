@@ -100,6 +100,73 @@ def _whitelist_attachments(attachments: Optional[List[Dict[str, Any]]]) -> List[
     return clean
 
 
+def _extract_message_fields(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract message fields from various webhook payload formats.
+
+    Handles:
+    - Event wrapper format: { event_type: "message.received", message: {...} }
+    - Nested message object: { message: { to: [...], subject: "..." } }
+    - Flat format: { to: [...], subject: "..." } (for local testing)
+
+    Returns a dict with normalized field names: to, subject, text, html, attachments, message_id
+    """
+    message_data = payload
+
+    # Try event wrapper format (AgentMail WebSocket API style)
+    if "event_type" in payload:
+        if payload.get("event_type") == "message.received" and "message" in payload:
+            message_data = payload["message"]
+    # Try nested message object
+    elif "message" in payload and isinstance(payload.get("message"), dict):
+        # Check if message contains expected fields
+        msg = payload["message"]
+        if any(key in msg for key in ["to", "subject", "text", "from", "recipients"]):
+            message_data = msg
+
+    # Extract fields with multiple fallback names
+    return {
+        "to": (
+            message_data.get("to") or
+            message_data.get("recipients") or
+            payload.get("to")  # Fallback to top-level
+        ),
+        "subject": (
+            message_data.get("subject") or
+            payload.get("subject")  # Fallback to top-level
+        ),
+        "text": (
+            message_data.get("text") or
+            message_data.get("plain") or
+            message_data.get("body") or
+            message_data.get("text_body") or
+            payload.get("text") or  # Fallback to top-level
+            payload.get("plain")
+        ),
+        "html": (
+            message_data.get("html") or
+            message_data.get("html_body") or
+            payload.get("html")  # Fallback to top-level
+        ),
+        "attachments": (
+            message_data.get("attachments") or
+            message_data.get("files") or
+            payload.get("attachments") or  # Fallback to top-level
+            payload.get("files") or
+            []
+        ),
+        "message_id": (
+            message_data.get("message_id") or
+            message_data.get("messageId") or
+            message_data.get("id") or
+            payload.get("message_id") or  # Fallback to top-level
+            payload.get("messageId") or
+            payload.get("id") or
+            payload.get("event_id")
+        ),
+    }
+
+
 def _resolve_daemon_id(to_field: Any) -> Optional[str]:
     # Accept string or list of strings; parse plus-tag as daemon hint
     if convex_client is None:
@@ -262,18 +329,31 @@ async def feed_by_email(request: Request):
             print(f"[ERROR] Raw body preview: {raw[:500]}")
             raise HTTPException(status_code=400, detail="Malformed payload")
 
-    to_field = payload.get("to")
-    subject = payload.get("subject") or ""
-    text = payload.get("text") or payload.get("plain") or ""
-    html = payload.get("html") or ""
-    attachments = payload.get("attachments") or payload.get("files") or []
-    # Support both snake_case (AgentMail format) and camelCase (legacy)
-    message_id = (
-        payload.get("message_id") or
-        payload.get("messageId") or
-        payload.get("id") or
-        str(uuid.uuid4())
-    )
+    # Debug logging to capture actual webhook structure
+    print("=" * 80)
+    print("[WEBHOOK DEBUG] Received webhook payload")
+    print(f"[WEBHOOK DEBUG] Payload keys: {list(payload.keys())}")
+    print(f"[WEBHOOK DEBUG] Full payload: {json.dumps(payload, indent=2)[:2000]}")
+    print("=" * 80)
+
+    # Extract fields using smart extraction (handles multiple payload formats)
+    fields = _extract_message_fields(payload)
+
+    to_field = fields["to"]
+    subject = fields["subject"] or ""
+    text = fields["text"] or ""
+    html = fields["html"] or ""
+    attachments = fields["attachments"] or []
+    message_id = fields["message_id"] or str(uuid.uuid4())
+
+    # Debug logging for extracted fields
+    print("[WEBHOOK DEBUG] Extracted fields:")
+    print(f"  to_field: {to_field}")
+    print(f"  subject: {subject}")
+    print(f"  text: {text[:100] if text else 'NONE'}...")
+    print(f"  message_id: {message_id}")
+    print(f"  attachments count: {len(attachments)}")
+    print("=" * 80)
 
     # Choose daemonId based on recipient; fallback to first available
     daemon_id = _resolve_daemon_id(to_field)
