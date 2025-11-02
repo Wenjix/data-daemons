@@ -97,6 +97,16 @@ $RECYCLE.BIN/
 agent-mail-reference.md
 convex-integration.md
 migration-plan.md
+HYPERSPELL_INTEGRATION.md
+visual-design-spec.md
+PRD.md
 
 # Test data
 TestFeeds/
+setup_agentmail_webhook.py
+test_hyperspell.py
+test_send_email.py
+verify_user_memories.py
+
+
+

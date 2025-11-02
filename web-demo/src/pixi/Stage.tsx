@@ -19,7 +19,8 @@ export function Stage() {
 
   const handleSummon = () => {
     console.log('Summoning daily report web app...')
-    // TODO: Implement actual summon logic
+    // Open the Memphis design agentify demo in a new tab
+    window.open('/agentify-demo.html', '_blank')
   }
 
   useEffect(() => {

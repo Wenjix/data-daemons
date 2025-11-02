@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Daemons: Agentify Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Impact', 'Arial Black', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        /* Memphis Background Patterns */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #000000;
+            text-shadow:
+                3px 3px 0 #ffbe0b,
+                6px 6px 0 #ff006e,
+                9px 9px 0 #00d4ff;
+            transform: rotate(-0.5deg);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7209b7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transform: rotate(0.5deg);
+        }
+
+        /* Daemon Pedestals Container */
+        .pedestals-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 60px;
+            padding: 40px 20px;
+            justify-items: center;
+        }
+
+        /* Individual Pedestal */
+        .pedestal {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* Daemon Portrait/Egg */
+        .daemon-portrait {
+            width: 180px;
+            height: 180px;
+            border: 4px solid #000000;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .daemon-portrait:hover {
+            box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.8) !important;
+        }
+
+        .daemon-portrait::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+        }
+
+        .nova-portrait {
+            background: #ff006e;
+            box-shadow: 8px 8px 0 #ffbe0b;
+            transform: rotate(45deg);
+        }
+
+        .nova-portrait::before {
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                #000000 10px,
+                #000000 12px
+            );
+        }
+
+        .pixel-portrait {
+            background: #7209b7;
+            box-shadow: 8px 8px 0 #00d4ff;
+            border-radius: 0;
+        }
+
+        .pixel-portrait::before {
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 20px,
+                #000000 20px,
+                #000000 22px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                #000000 20px,
+                #000000 22px
+            );
+        }
+
+        .echo-portrait {
+            background: #00d4ff;
+            box-shadow: 8px 8px 0 #8ac926;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .echo-portrait::before {
+            background: radial-gradient(circle, #000000 2px, transparent 2px);
+            background-size: 20px 20px;
+        }
+
+        /* Daemon Inner Icon */
+        .daemon-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 4rem;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .nova-portrait .daemon-icon {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .echo-portrait .daemon-icon {
+            transform: translate(-50%, -50%);
+        }
+
+        /* Nameplate */
+        .nameplate {
+            background: #000000;
+            color: #ffffff;
+            padding: 15px 40px;
+            border: 4px solid #000000;
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .nova-nameplate {
+            background: #ff006e;
+            box-shadow: 6px 6px 0 #000000;
+            transform: rotate(-1deg);
+        }
+
+        .pixel-nameplate {
+            background: #7209b7;
+            box-shadow: 6px 6px 0 #000000;
+            transform: rotate(0.5deg);
+        }
+
+        .echo-nameplate {
+            background: #00d4ff;
+            color: #000000;
+            box-shadow: 6px 6px 0 #000000;
+            transform: rotate(-0.5deg);
+        }
+
+        /* Speech Bubbles */
+        .speech-bubble {
+            position: relative;
+            padding: 25px 30px;
+            border: 4px solid #000000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.6;
+            max-width: 380px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+        }
+
+        .speech-bubble-content {
+            width: 100%;
+        }
+
+        .typing-text {
+            display: inline;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: currentColor;
+            margin-left: 2px;
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .nova-bubble {
+            background: #ff006e;
+            color: #ffffff;
+            box-shadow: 8px 8px 0 #ffbe0b;
+            transform: rotate(-0.8deg);
+        }
+
+        .pixel-bubble {
+            background: #7209b7;
+            color: #ffffff;
+            box-shadow: 8px 8px 0 #00d4ff;
+            transform: rotate(0.6deg);
+        }
+
+        .echo-bubble {
+            background: #00d4ff;
+            color: #000000;
+            box-shadow: 8px 8px 0 #8ac926;
+            transform: rotate(-0.5deg);
+        }
+
+        /* Speech Bubble Arrow */
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid #000000;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 18px solid transparent;
+            border-right: 18px solid transparent;
+            z-index: 1;
+        }
+
+        .nova-bubble::before {
+            border-top: 18px solid #ff006e;
+        }
+
+        .pixel-bubble::before {
+            border-top: 18px solid #7209b7;
+        }
+
+        .echo-bubble::before {
+            border-top: 18px solid #00d4ff;
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: #ffffff;
+            border: 4px solid #000000;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-container.nova-modal {
+            box-shadow: 12px 12px 0 #ff006e;
+        }
+
+        .modal-container.pixel-modal {
+            box-shadow: 12px 12px 0 #7209b7;
+        }
+
+        .modal-container.echo-modal {
+            box-shadow: 12px 12px 0 #00d4ff;
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 30px 40px;
+            border-bottom: 4px solid #000000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .modal-header.nova-header {
+            background: #ff006e;
+            color: #ffffff;
+        }
+
+        .modal-header.pixel-header {
+            background: #7209b7;
+            color: #ffffff;
+        }
+
+        .modal-header.echo-header {
+            background: #00d4ff;
+            color: #000000;
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: #000000;
+            color: #ffffff;
+            border: 3px solid #000000;
+            width: 50px;
+            height: 50px;
+            font-size: 2rem;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .modal-close:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: rotate(90deg);
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 40px;
+        }
+
+        .modal-subtitle {
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            color: #000000;
+            letter-spacing: 2px;
+        }
+
+        .email-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .email-card {
+            border: 4px solid #000000;
+            padding: 25px 30px;
+            position: relative;
+        }
+
+        .email-card.nova-card {
+            background: #ff006e;
+            color: #ffffff;
+            box-shadow: 8px 8px 0 #ffbe0b;
+            transform: rotate(-0.5deg);
+        }
+
+        .email-card.pixel-card {
+            background: #7209b7;
+            color: #ffffff;
+            box-shadow: 8px 8px 0 #00d4ff;
+            transform: rotate(0.3deg);
+        }
+
+        .email-card.echo-card {
+            background: #00d4ff;
+            color: #000000;
+            box-shadow: 8px 8px 0 #8ac926;
+            transform: rotate(-0.4deg);
+        }
+
+        .email-subject {
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .email-type {
+            display: inline-block;
+            background: #000000;
+            color: #ffffff;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .nova-card .email-type {
+            background: #ffbe0b;
+            color: #000000;
+        }
+
+        .pixel-card .email-type {
+            background: #00d4ff;
+            color: #000000;
+        }
+
+        .echo-card .email-type {
+            background: #8ac926;
+            color: #000000;
+        }
+
+        .email-body {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 700;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+                text-shadow:
+                    2px 2px 0 #ffbe0b,
+                    4px 4px 0 #ff006e,
+                    6px 6px 0 #00d4ff;
+            }
+
+            .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .pedestals-container {
+                gap: 80px;
+            }
+
+            .daemon-portrait {
+                width: 150px;
+                height: 150px;
+            }
+
+            .daemon-icon {
+                font-size: 3rem;
+            }
+
+            .nameplate {
+                font-size: 1.5rem;
+                padding: 12px 30px;
+            }
+
+            .speech-bubble {
+                font-size: 1rem;
+                padding: 20px 25px;
+            }
+
+            .modal-container {
+                box-shadow: 8px 8px 0 !important;
+            }
+
+            .modal-header {
+                padding: 20px 25px;
+            }
+
+            .modal-title {
+                font-size: 1.8rem;
+            }
+
+            .modal-close {
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 25px;
+            }
+
+            .email-card {
+                box-shadow: 6px 6px 0 !important;
+            }
+
+            .email-subject {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Hover Effects */
+        .pedestal:hover .daemon-portrait {
+            transform: rotate(45deg) scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        .nova-portrait:hover {
+            transform: rotate(48deg) scale(1.05);
+        }
+
+        .echo-portrait:hover {
+            transform: scale(1.05);
+        }
+
+        .pedestal:hover .speech-bubble {
+            transform: rotate(-0.8deg) translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+
+        .pixel-portrait:hover {
+            transform: rotate(3deg) scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Memphis Background Pattern -->
+    <svg class="background-pattern" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <pattern id="dots" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                <circle cx="10" cy="10" r="3" fill="#ff006e"/>
+                <circle cx="50" cy="50" r="4" fill="#00d4ff"/>
+                <circle cx="80" cy="30" r="2.5" fill="#ffbe0b"/>
+                <circle cx="30" cy="70" r="3.5" fill="#7209b7"/>
+                <circle cx="70" cy="85" r="3" fill="#8ac926"/>
+            </pattern>
+            <pattern id="zigzag" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+                <path d="M0,60 L20,40 L40,60 L60,40 L80,60 L100,40 L120,60" stroke="#fb5607" stroke-width="3" fill="none"/>
+                <path d="M0,20 L30,40 L60,20 L90,40 L120,20" stroke="#7209b7" stroke-width="2.5" fill="none"/>
+                <path d="M0,100 L25,85 L50,100 L75,85 L100,100 L120,85" stroke="#00d4ff" stroke-width="2" fill="none"/>
+            </pattern>
+            <pattern id="squiggles" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse">
+                <path d="M10,75 Q30,60 50,75 T90,75 T130,75" stroke="#ff006e" stroke-width="2.5" fill="none"/>
+                <path d="M0,30 Q20,15 40,30 T80,30 T120,30 T150,30" stroke="#8ac926" stroke-width="2" fill="none"/>
+                <path d="M20,120 Q40,105 60,120 T100,120 T140,120" stroke="#ffbe0b" stroke-width="3" fill="none"/>
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#dots)"/>
+        <rect width="100%" height="100%" fill="url(#zigzag)" opacity="0.6"/>
+        <rect width="100%" height="100%" fill="url(#squiggles)" opacity="0.5"/>
+    </svg>
+
+    <div class="content-wrapper">
+        <header>
+            <h1>Data Daemons<br>Agentify Mode</h1>
+            <p class="subtitle">Your AI Companions Are Ready to Help</p>
+        </header>
+
+        <div class="pedestals-container">
+            <!-- Nova Pedestal -->
+            <div class="pedestal">
+                <div class="speech-bubble nova-bubble">
+                    <div class="speech-bubble-content">
+                        <span class="typing-text" id="nova-text"></span>
+                        <span class="cursor" id="nova-cursor"></span>
+                    </div>
+                </div>
+                <div class="daemon-portrait nova-portrait" onclick="openModal('nova')">
+                    <div class="daemon-icon">📧</div>
+                </div>
+                <div class="nameplate nova-nameplate">Nova</div>
+            </div>
+
+            <!-- Pixel Pedestal -->
+            <div class="pedestal">
+                <div class="speech-bubble pixel-bubble">
+                    <div class="speech-bubble-content">
+                        <span class="typing-text" id="pixel-text"></span>
+                        <span class="cursor" id="pixel-cursor"></span>
+                    </div>
+                </div>
+                <div class="daemon-portrait pixel-portrait" onclick="openModal('pixel')">
+                    <div class="daemon-icon">🎨</div>
+                </div>
+                <div class="nameplate pixel-nameplate">Pixel</div>
+            </div>
+
+            <!-- Echo Pedestal -->
+            <div class="pedestal">
+                <div class="speech-bubble echo-bubble">
+                    <div class="speech-bubble-content">
+                        <span class="typing-text" id="echo-text"></span>
+                        <span class="cursor" id="echo-cursor"></span>
+                    </div>
+                </div>
+                <div class="daemon-portrait echo-portrait" onclick="openModal('echo')">
+                    <div class="daemon-icon">📝</div>
+                </div>
+                <div class="nameplate echo-nameplate">Echo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVA MODAL -->
+    <div id="nova-modal" class="modal-overlay" onclick="closeModalOnBackdrop(event, 'nova')">
+        <div class="modal-container nova-modal" onclick="event.stopPropagation()">
+            <div class="modal-header nova-header">
+                <h2 class="modal-title">Nova's Content Feed</h2>
+                <button class="modal-close" onclick="closeModal('nova')" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Visual & Artistic Content Examples</p>
+                <div class="email-cards">
+                    <!-- Email 1: Artwork -->
+                    <div class="email-card nova-card">
+                        <h3 class="email-subject">New Character Design - Cyberpunk Hacker</h3>
+                        <span class="email-type">Digital Illustration</span>
+                        <p class="email-body">
+                            Finished my latest digital illustration! It's a cyberpunk character - a street hacker with neon-blue hair and augmented reality glasses. The aesthetic is dark with lots of glowing elements: neon signs in the background, holographic interfaces, and electric blue accents throughout. Used a limited color palette of deep purples, blues, and hot pink highlights to create that classic cyberpunk mood. Created in Procreate with about 40 layers!
+                        </p>
+                    </div>
+
+                    <!-- Email 2: Photo -->
+                    <div class="email-card nova-card">
+                        <h3 class="email-subject">Beautiful Sunset Over Mountain Lake</h3>
+                        <span class="email-type">Landscape Photography</span>
+                        <p class="email-body">
+                            Just captured this amazing sunset photo at Mirror Lake! The sky was painted in layers of orange, pink, and purple, perfectly reflected in the crystal-clear water. The silhouette of the pine trees along the shoreline creates such a dramatic contrast. Shot with a 24mm lens at f/8, golden hour lighting was absolutely perfect. Really proud of how this one turned out - the colors are unedited, nature was just showing off today!
+                        </p>
+                    </div>
+
+                    <!-- Email 3: Data Visualization -->
+                    <div class="email-card nova-card">
+                        <h3 class="email-subject">Fascinating Data Visualization on Coffee Consumption</h3>
+                        <span class="email-type">Infographic</span>
+                        <p class="email-body">
+                            Check out this incredible infographic I found! It visualizes global coffee consumption patterns from 2020-2024. The design uses a coffee cup as the central element, with streams of data flowing out like steam. Each color represents a different region. The statistics are mind-blowing: Finland leads per capita consumption at 12kg per person annually! The whole thing has this minimalist Scandinavian design aesthetic that makes complex data feel accessible and beautiful.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIXEL MODAL -->
+    <div id="pixel-modal" class="modal-overlay" onclick="closeModalOnBackdrop(event, 'pixel')">
+        <div class="modal-container pixel-modal" onclick="event.stopPropagation()">
+            <div class="modal-header pixel-header">
+                <h2 class="modal-title">Pixel's Content Feed</h2>
+                <button class="modal-close" onclick="closeModal('pixel')" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Viral Videos & Entertainment Content</p>
+                <div class="email-cards">
+                    <!-- Email 1: Cat Video -->
+                    <div class="email-card pixel-card">
+                        <h3 class="email-subject">OMG you HAVE to see this cat video 😹</h3>
+                        <span class="email-type">Funny Cat Video</span>
+                        <p class="email-body">
+                            I'm literally crying laughing right now!! Just watched this video of a cat trying to jump onto a counter but completely miscalculating the distance. The confidence in its eyes right before the jump??? PRICELESS. And then it just slides down the cabinet in slow motion like a cartoon character 😂😂😂 Already sent it to like 10 people. This is peak cat content. The internet was invented for moments like this!
+                        </p>
+                    </div>
+
+                    <!-- Email 2: Meme Video -->
+                    <div class="email-card pixel-card">
+                        <h3 class="email-subject">This meme video is literally me rn 😭</h3>
+                        <span class="email-type">Relatable Meme</span>
+                        <p class="email-body">
+                            I feel SO CALLED OUT by this video lmao. It's that audio that goes "Monday again?" with the dramatic opera music, but someone edited it with clips of people dramatically falling or collapsing. The way they cut to that scene from The Office where everyone's just dead inside at their desks??? TOO REAL. It's giving "gaslight, gatekeep, girl-boss but make it exhausted millennial." Already reposted it with the caption "me pretending I have my life together" and it got 500 likes in an hour!
+                        </p>
+                    </div>
+
+                    <!-- Email 3: Fail Compilation -->
+                    <div class="email-card pixel-card">
+                        <h3 class="email-subject">Epic fail compilation had me DYING 💀😂</h3>
+                        <span class="email-type">Fail Compilation</span>
+                        <p class="email-body">
+                            Okay so I found this 10-minute compilation of people failing at the most random stuff and I'm deceased. There's this one clip of a guy trying to do a backflip off a diving board and he just... belly flops in the most spectacular way possible. And then there's a wedding video where the groom tries to dip the bride but they both fall over and knock into the cake 🎂💥 The best part? The bride is laughing so hard she can't even be mad. My face hurts from laughing!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ECHO MODAL -->
+    <div id="echo-modal" class="modal-overlay" onclick="closeModalOnBackdrop(event, 'echo')">
+        <div class="modal-container echo-modal" onclick="event.stopPropagation()">
+            <div class="modal-header echo-header">
+                <h2 class="modal-title">Echo's Content Feed</h2>
+                <button class="modal-close" onclick="closeModal('echo')" aria-label="Close">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-subtitle">Academic & Educational Content</p>
+                <div class="email-cards">
+                    <!-- Email 1: Homework -->
+                    <div class="email-card echo-card">
+                        <h3 class="email-subject">Math Assignment Due Friday - Calculus Problem Set</h3>
+                        <span class="email-type">Homework Assignment</span>
+                        <p class="email-body">
+                            Here's the homework assignment for this week. We need to complete Chapter 7, problems 1-20 focusing on integration techniques. The problem set covers integration by parts, trigonometric substitution, and partial fractions. Problems 15-18 are particularly challenging - they involve both u-substitution and integration by parts in the same problem. The assignment is worth 50 points and counts toward our midterm grade. Study group is meeting Thursday night if anyone wants to work through these together!
+                        </p>
+                    </div>
+
+                    <!-- Email 2: Research -->
+                    <div class="email-card echo-card">
+                        <h3 class="email-subject">Research Paper - Climate Change Impact on Marine Ecosystems</h3>
+                        <span class="email-type">Research Paper</span>
+                        <p class="email-body">
+                            Sharing my research findings for our Environmental Science project on climate change effects on marine biodiversity. After analyzing data from the past 30 years, I've found significant correlations between ocean temperature rise and coral reef degradation. Key findings: Average ocean temperatures have increased by 0.13°C per decade since 1990, correlating with a 50% reduction in live coral coverage. The most concerning discovery is the acceleration of ocean acidification. Would appreciate feedback on the data visualization graphs!
+                        </p>
+                    </div>
+
+                    <!-- Email 3: Study Notes -->
+                    <div class="email-card echo-card">
+                        <h3 class="email-subject">Study Notes - European History Exam Next Week</h3>
+                        <span class="email-type">Study Notes</span>
+                        <p class="email-body">
+                            Compiled study notes for the European History midterm covering 1500-1800. Key topics: RENAISSANCE (started in Italy, emphasis on humanism), REFORMATION (Martin Luther's 95 Theses in 1517), AGE OF EXPLORATION (Columbus 1492, Magellan circumnavigation), ABSOLUTISM (Louis XIV, divine right of kings), ENLIGHTENMENT (Locke, Voltaire, Rousseau). Professor said to focus on cause-and-effect relationships and be ready to write essay comparing absolutism vs. Enlightenment ideals. Memorize dates for major events!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daemon messages from the agentify workflow
+        const messages = {
+            nova: "I can help you analyze your inbox patterns and surface insights from your communications",
+            pixel: "Let me craft a visual dashboard to track your creative projects and inspiration sources",
+            echo: "I'll synthesize your meeting notes into actionable summaries and track follow-ups"
+        };
+
+        // Typing animation function
+        function typeMessage(elementId, cursorId, message, delay = 45, startDelay = 0) {
+            const element = document.getElementById(elementId);
+            const cursor = document.getElementById(cursorId);
+            let index = 0;
+
+            setTimeout(() => {
+                const typeInterval = setInterval(() => {
+                    if (index < message.length) {
+                        element.textContent += message[index];
+                        index++;
+                    } else {
+                        clearInterval(typeInterval);
+                        // Hide cursor after typing is complete
+                        setTimeout(() => {
+                            cursor.style.display = 'none';
+                        }, 500);
+                    }
+                }, delay);
+            }, startDelay);
+        }
+
+        // Modal functions
+        function openModal(daemonName) {
+            const modal = document.getElementById(`${daemonName}-modal`);
+            document.body.classList.add('modal-open');
+            modal.style.display = 'flex';
+            // Trigger reflow to enable transition
+            modal.offsetHeight;
+            modal.classList.add('active');
+        }
+
+        function closeModal(daemonName) {
+            const modal = document.getElementById(`${daemonName}-modal`);
+            modal.classList.remove('active');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            }, 300);
+        }
+
+        function closeModalOnBackdrop(event, daemonName) {
+            if (event.target.classList.contains('modal-overlay')) {
+                closeModal(daemonName);
+            }
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                ['nova', 'pixel', 'echo'].forEach(daemon => {
+                    const modal = document.getElementById(`${daemon}-modal`);
+                    if (modal.classList.contains('active')) {
+                        closeModal(daemon);
+                    }
+                });
+            }
+        });
+
+        // Initialize typing animations with staggered delays
+        window.addEventListener('DOMContentLoaded', () => {
+            typeMessage('nova-text', 'nova-cursor', messages.nova, 45, 300);
+            typeMessage('pixel-text', 'pixel-cursor', messages.pixel, 45, 800);
+            typeMessage('echo-text', 'echo-cursor', messages.echo, 45, 1300);
+        });
+    </script>
+</body>
+</html>

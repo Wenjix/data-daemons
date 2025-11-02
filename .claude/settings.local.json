@@ -11,7 +11,8 @@
       "mcp__playwright__browser_click",
       "mcp__serena__get_symbols_overview",
       "mcp__serena__list_dir",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(pip install:*)"
     ],
     "deny": [],
     "ask": []
