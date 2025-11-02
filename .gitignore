@@ -107,6 +107,7 @@ setup_agentmail_webhook.py
 test_hyperspell.py
 test_send_email.py
 verify_user_memories.py
+add_user_memories.py
 
 
 
